@@ -7,6 +7,7 @@ import org.hibernate.cfg.Configuration;
 import ru.shaplov.models.Item;
 
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Singleton dao class.
@@ -29,6 +30,21 @@ public class DbStore implements IStore {
         return INSTANCE;
     }
 
+    private <T> T tran(final Function<Session, T> command) {
+        Transaction tx = null;
+        try (Session session = factory.openSession()) {
+            tx = session.beginTransaction();
+            T result = command.apply(session);
+            tx.commit();
+            return result;
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            throw e;
+        }
+    }
+
     /**
      * Adds item to DB.
      * @param item new item w/o id.
@@ -36,18 +52,10 @@ public class DbStore implements IStore {
      */
     @Override
     public Item add(Item item) {
-        Transaction tx = null;
-        try (Session session = factory.openSession()) {
-            tx = session.beginTransaction();
+        return tran(session -> {
             session.save(item);
-            tx.commit();
             return item;
-        } catch (Exception e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-        }
-        throw new IllegalStateException("Something wrong with item addition");
+        });
     }
 
     /**
@@ -57,18 +65,10 @@ public class DbStore implements IStore {
      */
     @Override
     public Item update(Item item) {
-        Transaction tx = null;
-        try (Session session = factory.openSession()) {
-            tx = session.beginTransaction();
+        return tran(session -> {
             session.update(item);
-            tx.commit();
             return item;
-        } catch (Exception e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-        }
-        throw new IllegalStateException("Something wrong with item addition");
+        });
     }
 
     /**
@@ -77,18 +77,10 @@ public class DbStore implements IStore {
      */
     @Override
     public void delete(Item item) {
-        Transaction tx = null;
-        try (Session session = factory.openSession()) {
-            tx = session.beginTransaction();
+        tran(session -> {
             session.delete(item);
-            tx.commit();
-        } catch (Exception e) {
-            if (tx != null) {
-                tx.rollback();
-                throw new IllegalStateException("Something wrong with delete");
-            }
-        }
-
+            return null;
+        });
     }
 
     /**
@@ -98,18 +90,7 @@ public class DbStore implements IStore {
      */
     @Override
     public Item get(Item item) {
-        Transaction tx = null;
-        try (Session session = factory.openSession()) {
-            tx = session.beginTransaction();
-            Item result = session.get(Item.class, item.getId());
-            tx.commit();
-            return result;
-        } catch (Exception e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-        }
-        throw new IllegalStateException("Something wrong with get");
+        return tran(session -> session.get(Item.class, item.getId()));
     }
 
     /**
@@ -118,17 +99,6 @@ public class DbStore implements IStore {
      */
     @Override
     public List<Item> getAll() {
-        Transaction tx = null;
-        try (Session session = factory.openSession()) {
-            tx = session.beginTransaction();
-            List<Item> result = session.createQuery("from Item", Item.class).list();
-            tx.commit();
-            return result;
-        } catch (Exception e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-        }
-        throw new IllegalStateException("Something wrong with getAll");
+        return tran(session -> session.createQuery("from Item", Item.class).list());
     }
 }
