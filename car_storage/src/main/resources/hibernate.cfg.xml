@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-configuration>
+    <session-factory>
+        <property name="connection.url">jdbc:postgresql://localhost:5433/car_catalog</property>
+        <property name="connection.driver_class">org.postgresql.Driver</property>
+        <property name="connection.username">postgres</property>
+        <property name="connection.password">123456</property>
+        <property name="dialect">org.hibernate.dialect.PostgreSQL10Dialect</property>
+
+        <mapping resource="ru/shaplov/models/CarXML.hbm.xml"/>
+        <mapping resource="ru/shaplov/models/CarBodyXML.hbm.xml"/>
+        <mapping resource="ru/shaplov/models/EngineXML.hbm.xml"/>
+        <mapping resource="ru/shaplov/models/TransmissionXML.hbm.xml"/>
+
+        <mapping class="ru.shaplov.models.CarBodyANN"/>
+        <mapping class="ru.shaplov.models.TransmissionANN"/>
+        <mapping class="ru.shaplov.models.EngineANN"/>
+        <mapping class="ru.shaplov.models.CarANN"/>
+    </session-factory>
+</hibernate-configuration>

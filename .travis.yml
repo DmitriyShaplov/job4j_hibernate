@@ -5,6 +5,13 @@ sudo: false
 
 jdk: openjdk11
 
+services:
+  - postgresql
+
+before_install:
+  - psql -c 'create database car_catalog;' -U postgres
+  - psql -c 'create database hiber;' -U postgres
+
 # Отправлять уведомление на почтуyouremail@smtp.ru(Изменить на свою) если сборка упала
 notifications:
   email:
