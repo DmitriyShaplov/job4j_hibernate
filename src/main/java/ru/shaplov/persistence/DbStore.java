@@ -90,7 +90,9 @@ public class DbStore implements IStore {
      */
     @Override
     public Item get(Item item) {
-        return tran(session -> session.get(Item.class, item.getId()));
+        try (Session session = factory.openSession()) {
+            return session.get(Item.class, item.getId());
+        }
     }
 
     /**
@@ -99,6 +101,8 @@ public class DbStore implements IStore {
      */
     @Override
     public List<Item> getAll() {
-        return tran(session -> session.createQuery("from Item", Item.class).list());
+        try (Session session = factory.openSession()) {
+            return session.createQuery("from Item", Item.class).list();
+        }
     }
 }
