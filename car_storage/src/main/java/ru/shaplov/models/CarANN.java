@@ -1,6 +1,7 @@
 package ru.shaplov.models;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 /**
  * @author shaplov
@@ -65,5 +66,26 @@ public class CarANN implements IEntity {
 
     public void setTransmission(TransmissionANN transmission) {
         this.transmission = transmission;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CarANN carANN = (CarANN) o;
+        return id == carANN.id
+                && Objects.equals(name, carANN.name)
+                && Objects.equals(carBody, carANN.carBody)
+                && Objects.equals(engine, carANN.engine)
+                && Objects.equals(transmission, carANN.transmission);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, carBody, engine, transmission);
     }
 }

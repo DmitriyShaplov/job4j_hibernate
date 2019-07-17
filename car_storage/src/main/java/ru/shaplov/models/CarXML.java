@@ -1,5 +1,7 @@
 package ru.shaplov.models;
 
+import java.util.Objects;
+
 /**
  * @author shaplov
  * @since 08.07.2019
@@ -53,5 +55,25 @@ public class CarXML implements IEntity {
 
     public void setTransmission(TransmissionXML transmission) {
         this.transmission = transmission;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CarXML carXML = (CarXML) o;
+        return id == carXML.id && Objects.equals(name, carXML.name)
+                && Objects.equals(carBody, carXML.carBody)
+                && Objects.equals(engine, carXML.engine)
+                && Objects.equals(transmission, carXML.transmission);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, carBody, engine, transmission);
     }
 }

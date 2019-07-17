@@ -1,6 +1,7 @@
 package ru.shaplov.models;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 /**
  * @author shaplov
@@ -29,5 +30,22 @@ public class TransmissionANN implements IEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        TransmissionANN that = (TransmissionANN) o;
+        return id == that.id && Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
     }
 }

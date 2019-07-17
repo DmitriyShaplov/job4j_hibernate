@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset shaplov:1
+--changeset shaplov:2
 create table car_body (
                         id serial primary key,
                         name varchar(200)
