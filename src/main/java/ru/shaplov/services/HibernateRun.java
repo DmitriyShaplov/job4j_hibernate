@@ -49,6 +49,23 @@ public class HibernateRun {
         throw new IllegalStateException("Something wrong with user creation");
     }
 
+    public User update(User user) {
+        Transaction tx = null;
+        try (Session session = factory.openSession()) {
+            tx = session.beginTransaction();
+            User result = session.get(User.class, user.getId());
+            result.setName("UPDATED!");
+            tx.commit();
+            return result;
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+                throw e;
+            }
+        }
+        throw new IllegalStateException("Something wrong with user creation");
+    }
+
     /**
      * Find user by id in db.
      * @param id User's id
@@ -122,8 +139,7 @@ public class HibernateRun {
         System.out.println(userId);
         user = hiberTest.findUser(userId);
         System.out.println(user);
-        user.setName("Test updated");
-        hiberTest.saveOrUpdate(user);
+        hiberTest.update(user);
         user = hiberTest.findUser(userId);
         System.out.println(user);
         hiberTest.deleteUser(user);

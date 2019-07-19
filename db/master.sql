@@ -7,3 +7,12 @@ create table users (
   expire_date timestamp
 );
 --rollback drop table users;
+
+--changeset shaplov:2
+create table item (
+  id serial primary key,
+  description text not null,
+  created timestamp,
+  done boolean default false
+);
+--rollback drop table item;

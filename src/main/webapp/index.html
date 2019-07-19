@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Todo list</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <style>
+        .modal-header, h4, .close {
+            background-color: #5cb85c;
+            color:white !important;
+            text-align: center;
+            font-size: 30px;
+        }
+
+        th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #40555e;
+            color: white;
+        }
+
+        i {
+            font-size:24px;
+        }
+
+        .fa-check {
+            color: green;
+        }
+
+        .fa-times {
+            color: red;
+        }
+
+        .acceptable:hover {
+            cursor: pointer;
+            color: blue;
+        }
+        .centred {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <button type="button" class="btn btn-info btn-lg" data-toggle="modal"
+            data-target="#createItemModal">Создать новое задание</button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="createItemModal" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Новая задача</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="was-validated">
+                        <textarea class="form-control is-invalid" id="description"
+                                  placeholder="Введите описание задачи"
+                                  rows="5" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="acceptItem()">Создать задание</button>
+                    <button type="button" class="btn btn-light" data-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="custom-control custom-checkbox" style="float: right">
+            <input type="checkbox" class="custom-control-input" id="checkbox1" checked>
+            <label class="custom-control-label" for="checkbox1">Показать все</label>
+        </div>
+        <table id="table" class="table table-hover table-bordered">
+            <thead>
+            <tr></tr>
+            <tr>
+                <th>Id</th>
+                <th>Описание</th>
+                <th>Создана</th>
+                <th class="centred" style="width: 100px">Статус</th>
+            </thead>
+            <tbody id="table-body">
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    $(
+        function () {
+            $.ajax("./items").done(function (data) {
+                var result = "";
+                for (var i = 0; i < data.length; ++i) {
+                    var date = new Date(data[i].created);
+                    result += "<tr>"
+                        + "<td>" + data[i].id + "</td>"
+                        + "<td>" + data[i].description + "</td>"
+                        + "<td>" + date.toLocaleDateString("ru") + "</td>";
+                    if (data[i].done === true) {
+                        result += "<td class=\"centred\"><i class=\"fas fa-check\"></i>" +
+                            "<input name=\"isDone\" type=\"hidden\" value=\"true\"/></td></tr>";
+                    } else {
+                        result += "<td class=\"centred\"><i class=\"fas fa-times acceptable\"></i>" +
+                            "<input name=\"isDone\" type=\"hidden\" value=\"false\"/></td></tr>";
+                    }
+                }
+                $("#table-body").html(result);
+            })
+        }
+    );
+
+    $(
+        function () {
+            $("#checkbox1").click(function () {
+                if ($(this).prop("checked") !== true) {
+                    $("#table-body tr").each(function () {
+                        if ($(this).find($("[name='isDone']")).val() === "true") {
+                            $(this).hide();
+                        }
+                    })
+                } else {
+                    $("#table-body tr").each(function () {
+                        $(this).show();
+                    })
+                }
+            })
+        }
+    );
+
+
+    $("#table-body").on("click", ".acceptable", function () {
+        if (confirm("Перевести задачу на статус \"выполнено\"?")) {
+            var element = $(this);
+            var id = $(this).parent().siblings("td:eq(0)").text();
+            $.ajax("./item-update", {
+                method: "post",
+                dataType: "json",
+                data: JSON.stringify({
+                    id: id,
+                    done: true
+                })
+            }).done(function(data) {
+                if (data.done === true) {
+                    element.removeClass("fa-times acceptable").addClass("fa-check");
+                    element.siblings($("[name='isDone']")).val("true");
+                    element.off();
+                }
+            });
+        }
+    });
+
+    function acceptItem() {
+        if (!validate()) {
+            return;
+        }
+        var description = $("#description");
+        var text = description.val();
+        $.ajax("./items", {
+            method: "post",
+            data: JSON.stringify({
+                description: text
+            }),
+            dataType: "json"
+        }).done(function (data) {
+            var result = "";
+            var date = new Date(data.created);
+            result += "<tr>" +
+                "<td>" + data.id + "</td>" +
+                "<td>" + data.description + "</td>" +
+                "<td>" + date.toLocaleDateString("ru") + "</td>";
+            if (data.done === true) {
+                result += "<td class=\"centred\"><i class=\"fas fa-check\"></i>" +
+                    "<input name=\"isDone\" type=\"hidden\" value=\"true\"/></td></tr>";
+            } else {
+                result += "<td class=\"centred\"><i class=\"fas fa-times acceptable\"></i>" +
+                    "<input name=\"isDone\" type=\"hidden\" value=\"false\"/></td></tr>";
+            }
+            $("#createItemModal").modal("hide");
+            description.val("");
+            $("#table-body").append(result);
+        })
+    }
+
+    function validate() {
+        var res = true;
+        if ($("#description").val() === "") {
+            res = false;
+            alert("Заполните описание задачи!");
+        }
+        return res;
+    }
+</script>
+</body>
+</html>
