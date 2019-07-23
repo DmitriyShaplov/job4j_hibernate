@@ -2,19 +2,20 @@ package ru.shaplov.logic;
 
 import ru.shaplov.models.*;
 import ru.shaplov.persistence.CarDAO;
-import ru.shaplov.persistence.IDao;
+import ru.shaplov.persistence.IDaoCrud;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
  * @author shaplov
  * @since 14.07.2019
  */
-public class LogicDB implements ILogic {
+public class LogicDB implements ILogicDB {
 
     private final static LogicDB INSTANCE = new LogicDB();
 
-    private final IDao dao = CarDAO.getInstance();
+    private final IDaoCrud dao = CarDAO.getInstance();
 
     private LogicDB() {
     }
@@ -49,42 +50,22 @@ public class LogicDB implements ILogic {
     }
 
     @Override
-    public List<ITitledEntity> getBodyTypes(int modelId) {
-        return dao.getBodyTypes(modelId);
+    public List<IEntity> getItemsForDate(LocalDate date) {
+        return dao.getItemsForDate(date);
     }
 
     @Override
-    public List<ITitledEntity> getEngineTypes(int modelId, int bodyId) {
-        return dao.getEngineTypes(modelId, bodyId);
+    public List<IEntity> getItemsForBrand(int brandId) {
+        return dao.getItemsForBrand(brandId);
     }
 
     @Override
-    public List<ITitledEntity> getDriveTypes(int modelId, int bodyId, int engineId) {
-        return dao.getDriveTypes(modelId, bodyId, engineId);
-    }
-
-    @Override
-    public List<ITitledEntity> getTransTypes(int modelId, int bodyId, int engineId, int driveId) {
-        return dao.getTransTypes(modelId, bodyId, engineId, driveId);
+    public List<IEntity> getItemsWithImg() {
+        return dao.getItemsWithImg();
     }
 
     @Override
     public CarUser authUser(String login, String password) {
         return dao.authUser(login, password);
-    }
-
-    @Override
-    public int getItemCount() {
-        return dao.getItemCount();
-    }
-
-    @Override
-    public int getLastItemId() {
-        return dao.getLastItemId();
-    }
-
-    @Override
-    public boolean isSold(int id) {
-        return dao.isSold(id);
     }
 }

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.exception.ConstraintViolationException;
-import ru.shaplov.logic.ILogic;
+import ru.shaplov.logic.ILogicDB;
 import ru.shaplov.logic.LogicDB;
 import ru.shaplov.models.CarUser;
 
@@ -28,7 +28,7 @@ public class RegistrationController extends HttpServlet {
 
     private final Logger logger = LogManager.getLogger(RegistrationController.class);
 
-    private final ILogic logic = LogicDB.getInstance();
+    private final ILogicDB logic = LogicDB.getInstance();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

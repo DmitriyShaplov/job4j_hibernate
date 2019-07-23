@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.shaplov.logic.ILogic;
-import ru.shaplov.logic.LogicDB;
-import ru.shaplov.models.Item;
+import ru.shaplov.logic.ILogicStatus;
+import ru.shaplov.logic.LogicStatus;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -25,7 +24,7 @@ public class StatusController extends HttpServlet {
 
     private final Logger logger = LogManager.getLogger(StatusController.class);
 
-    private final ILogic logic = LogicDB.getInstance();
+    private final ILogicStatus logic = LogicStatus.getInstance();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

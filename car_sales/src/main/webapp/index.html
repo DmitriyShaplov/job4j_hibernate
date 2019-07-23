@@ -115,8 +115,15 @@
         .sign-in {
             background-color: #2196F3;
         }
+
         .modal-footer {
             background-color: #f9f9f9;
+        }
+
+        .filters {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: white;
         }
     </style>
 </head>
@@ -212,7 +219,19 @@
             </div>
         </div>
     </div>
-
+    <div class="form-inline filters">
+        <label for="filter" class="mr-sm-2 mt-2 ml-2">Показать:</label>
+        <select class="form-control mb-2 mt-2 mr-sm-2" id="filter">
+            <option value = 'ALL'>Все</option>
+            <option value = 'TODAY'>Только за сегодня</option>
+            <option value = 'WITH_IMG'>Только с картинкой</option>
+            <option value = 'BRAND'>По бренду</option>
+        </select>
+        <label for="filteredBrand" class="mr-sm-2 mt-2" id="label-filteredBrand" style="display: none">Марка:</label>
+        <select class="form-control mb-2 mr-sm-2 mt-2" id="filteredBrand" style="display: none">
+            <option selected value='-1'>-</option>
+        </select>
+    </div>
     <div class="all-items">
     </div>
 </div>
@@ -220,6 +239,68 @@
 
 <script>
     var userId = -1;
+    var filter = "ALL"; //"TODAY" //"WITH_IMG" //"BRAND"
+    var filteredBrand = "";
+    var ALL = "ALL";
+
+    $(loadBrand());
+
+    $(
+      $("#filter").change(function () {
+          var filterStatus = $(this).children(":selected").val();
+          if (filterStatus !== 'BRAND') {
+              $("#filteredBrand").hide();
+              $("#label-filteredBrand").hide();
+              filter = filterStatus;
+              loadItems();
+          } else {
+              $("#filteredBrand").show();
+              $("#label-filteredBrand").show();
+              var brandId = $("#filteredBrand").children(":selected").val();
+              if (brandId !== '-1') {
+                  filter = filterStatus;
+                  filteredBrand = brandId;
+                  loadItems();
+              } else {
+                  filter = ALL;
+                  loadItems();
+              }
+          }
+      })
+    );
+
+    $(
+       $("#filteredBrand").change(function () {
+           var filterStatus = $("#filter").children(":selected").val()
+           var brandId = $(this).children(":selected").val();
+           if (filterStatus !== 'BRAND') {
+               return;
+           }
+           if (brandId !== '-1') {
+               filter = filterStatus;
+               filteredBrand = brandId;
+               loadItems();
+           } else {
+               filter = ALL;
+               loadItems();
+           }
+       })
+    );
+
+    function loadBrand() {
+        $.ajax("./car_parts", {
+            type: "get",
+            data: "type=brand",
+            dataType: "json"
+        }).done(function (values) {
+            var result = "";
+            result += "<option selected value='-1'>-</option>";
+            values.forEach(function (value) {
+                result += "<option value='" + value.id + "'>" + value.title + "</option>";
+            });
+            $("#filteredBrand").html(result);
+        });
+    }
 
     $(
         function() {
@@ -368,10 +449,12 @@
         }
     }
 
-    $("#exit").click(function (e) {
-        e.preventDefault();
-        logout();
-    });
+    $(
+        $("#exit").click(function (e) {
+            e.preventDefault();
+            logout();
+        })
+    );
 
     function logout() {
         $.post("./logout").done(function () {
@@ -391,7 +474,13 @@
     });
 
     function loadItems() {
-        $.ajax("./items").done(function (data) {
+        $.ajax("./items", {
+            data: {
+                filter: filter,
+                filteredBrand: filteredBrand
+            },
+            dataType: "json"
+        }).done(function (data) {
             var allItems = $(".all-items");
             allItems.empty();
             data.forEach(function (item) {
@@ -452,7 +541,11 @@
                 let newElements = $(itemHtml).appendTo(allItems);
                 newElements.find(".item_title").text(item.title);
                 newElements.find(".tel").text(item.user.tel);
-                newElements.find("img").attr("src", item.picture);
+                if (item.picture != null) {
+                    newElements.find("img").prop("src", item.picture);
+                } else {
+                    newElements.find("img").prop("src", "images/system/No_image.png");
+                }
                 newElements.find(".brand").text(item.brand);
                 newElements.find(".model").text(item.model);
                 newElements.find(".body").text(item.body);
@@ -528,7 +621,9 @@
         return $.ajax("./check-items", {
             data: {
                 lastId: itemId,
-                size: size
+                size: size,
+                filter: filter,
+                filteredBrand: filteredBrand
             },
             dataType: "json"
         }).done(function (data) {
@@ -621,6 +716,5 @@
             $("#username-reg").focus();
         })
     );
-
 </script>
 </html>

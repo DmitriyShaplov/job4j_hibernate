@@ -1,27 +1,22 @@
 package ru.shaplov.servlets;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.shaplov.logic.ILogic;
+import ru.shaplov.logic.ILogicDB;
 import ru.shaplov.logic.LogicDB;
 import ru.shaplov.models.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * @author shaplov
@@ -32,7 +27,7 @@ public class AddItemController extends HttpServlet {
 
     private final Logger logger = LogManager.getLogger(AddItemController.class);
 
-    private final ILogic logic = LogicDB.getInstance();
+    private final ILogicDB logic = LogicDB.getInstance();
 
     private final Map<String, BiConsumer<String, Item>> paramMap = new HashMap<>();
 
@@ -86,24 +81,25 @@ public class AddItemController extends HttpServlet {
                     } else {
                         String fileName = fileItem.getName();
                         String contentType = fileItem.getContentType();
-                        if (!contentType.equals("image/jpeg")) {
-                            logger.error("Wrong content type, must be image/jpeg but was " + contentType);
-                            resp.sendError(400, "wrong image type");
-                            return;
+                        if (fileItem.getSize() > 0) {
+                            if (!contentType.equals("image/jpeg")) {
+                                logger.error("Wrong content type, must be image/jpeg but was " + contentType);
+                                resp.sendError(400, "wrong image type");
+                                return;
+                            }
+                            String generatedName = fileName.substring(0, fileName.lastIndexOf("."))
+                                    + new Random().nextInt()
+                                    + fileName.substring(fileName.lastIndexOf("."));
+                            Path generatedPath = Paths.get(path.toString(), generatedName);
+                            fileItem.write(generatedPath.toFile());
+                            String realPath = getServletContext().getRealPath("");
+                            String picture = Paths.get(realPath).relativize(generatedPath).toString();
+                            item.setPicture(picture);
                         }
-                        String generatedName = fileName.substring(0, fileName.lastIndexOf("."))
-                                + new Random().nextInt()
-                                + fileName.substring(fileName.lastIndexOf("."));
-                        Path generatedPath = Paths.get(path.toString(), generatedName);
-                        fileItem.write(generatedPath.toFile());
-                        String realPath = getServletContext().getRealPath("");
-                        String picture = Paths.get(realPath).relativize(generatedPath).toString();
-                        item.setPicture(picture);
-
-                        logic.save(item);
-                        resp.sendRedirect(String.format("%s/index.html", req.getContextPath()));
                     }
                 }
+                logic.save(item);
+                resp.sendRedirect(String.format("%s/index.html", req.getContextPath()));
             }
         } catch (Exception e) {
             logger.error("Error parsing multipart/form-data");

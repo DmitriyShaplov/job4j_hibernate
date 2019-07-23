@@ -3,14 +3,10 @@ package ru.shaplov.persistence;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.criterion.Projections;
 import ru.shaplov.models.*;
+import ru.shaplov.util.HibernateUtil;
 
-import javax.persistence.NoResultException;
-import java.util.Calendar;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Function;
 
@@ -18,27 +14,13 @@ import java.util.function.Function;
  * @author shaplov
  * @since 13.07.2019
  */
-public class CarDAO implements IDao {
+public class CarDAO implements IDaoCrud {
 
     private final static CarDAO INSTANCE = new CarDAO();
 
-    private final SessionFactory factory;
+    private final SessionFactory factory = HibernateUtil.getInstance().getSessionFactory();
 
-    /**
-     * private Constructor.
-     * Constructs SessionFactory object.
-     */
     private CarDAO() {
-        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
-                .configure()
-                .build();
-        try {
-            factory = new MetadataSources(registry)
-                    .buildMetadata().buildSessionFactory();
-        } catch (Exception e) {
-            StandardServiceRegistryBuilder.destroy(registry);
-            throw e;
-        }
     }
 
     public static CarDAO getInstance() {
@@ -110,69 +92,6 @@ public class CarDAO implements IDao {
         }
     }
 
-    /**
-     * Get List of body types.
-     * @param modelId model id.
-     */
-    public List<ITitledEntity> getBodyTypes(int modelId) {
-        try (Session session = factory.openSession()) {
-            return session.createQuery("select distinct body from Unifying u where u.model.id = :modelId", ITitledEntity.class)
-                    .setParameter("modelId", modelId)
-                    .getResultList();
-        }
-    }
-
-    /**
-     * Gets List of engine types.
-     * @param modelId model id.
-     * @param bodyId body id.
-     */
-    public List<ITitledEntity> getEngineTypes(int modelId, int bodyId) {
-        try (Session session = factory.openSession()) {
-            return session.createQuery("select distinct engine from Unifying u where u.model.id = :modelId"
-                    + " and u.body.id = :bodyId", ITitledEntity.class)
-                    .setParameter("modelId", modelId)
-                    .setParameter("bodyId", bodyId)
-                    .getResultList();
-        }
-    }
-
-    /**
-     * Get List of drive types.
-     * @param modelId model id.
-     * @param bodyId body id.
-     * @param engineId engine id.
-     */
-    public List<ITitledEntity> getDriveTypes(int modelId, int bodyId, int engineId) {
-        try (Session session = factory.openSession()) {
-            return session.createQuery("select distinct drive from Unifying u where u.model.id = :modelId"
-                    + " and u.body.id = :bodyId and u.engine.id = :engineId", ITitledEntity.class)
-                    .setParameter("modelId", modelId)
-                    .setParameter("bodyId", bodyId)
-                    .setParameter("engineId", engineId)
-                    .getResultList();
-        }
-    }
-
-    /**
-     * Get List of transmission types.
-     * @param modelId model id.
-     * @param bodyId body id.
-     * @param engineId engine id.
-     * @param driveId drive id.
-     */
-    public List<ITitledEntity> getTransTypes(int modelId, int bodyId, int engineId, int driveId) {
-        try (Session session = factory.openSession()) {
-            return session.createQuery("select distinct trans from Unifying u where u.model.id = :modelId"
-                    + " and u.body.id = :bodyId and u.engine.id = :engineId and u.drive.id = :driveId", ITitledEntity.class)
-                    .setParameter("modelId", modelId)
-                    .setParameter("bodyId", bodyId)
-                    .setParameter("engineId", engineId)
-                    .setParameter("driveId", driveId)
-                    .getResultList();
-        }
-    }
-
     @Override
     public CarUser authUser(String login, String password) {
         try (Session session = factory.openSession()) {
@@ -184,27 +103,46 @@ public class CarDAO implements IDao {
         }
     }
 
+    /**
+     * Get items for specified date.
+     * @param date LocalDate.
+     * @return List of Items.
+     */
     @Override
-    public int getItemCount() {
+    public List<IEntity> getItemsForDate(LocalDate date) {
         try (Session session = factory.openSession()) {
-           return session.createQuery("select count(*) from Item", Number.class).getSingleResult().intValue();
+            return session.createQuery("from Item where year(created) = :year and "
+                    + "month(created) = :month and day(created) = :day order by id desc", IEntity.class)
+                    .setParameter("year", date.getYear())
+                    .setParameter("month", date.getMonth().getValue())
+                    .setParameter("day", date.getDayOfMonth())
+                    .getResultList();
         }
     }
 
+    /**
+     * Get items only with stored image.
+     * @return List of Items.
+     */
     @Override
-    public int getLastItemId() {
+    public List<IEntity> getItemsWithImg() {
         try (Session session = factory.openSession()) {
-            return session.createQuery("select id From Item order by id desc", Number.class).setMaxResults(1)
-                    .getSingleResult().intValue();
+            return session.createQuery("from Item where picture is not null order by id desc", IEntity.class)
+                    .getResultList();
         }
     }
 
+    /**
+     * Get items for specified brand.
+     * @param brandId int brandId.
+     * @return List of items.
+     */
     @Override
-    public boolean isSold(int id) {
+    public List<IEntity> getItemsForBrand(int brandId) {
         try (Session session = factory.openSession()) {
-            return session.createQuery("select sold From Item where id = :id", Boolean.class)
-                    .setParameter("id", id)
-                    .getSingleResult();
+            return session.createQuery("from Item where brand.id = :brandId order by id desc", IEntity.class)
+                    .setParameter("brandId", brandId)
+                    .getResultList();
         }
     }
 }

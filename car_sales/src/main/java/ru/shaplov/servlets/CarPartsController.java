@@ -1,8 +1,10 @@
 package ru.shaplov.servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ru.shaplov.logic.ILogic;
+import ru.shaplov.logic.ILogicDB;
+import ru.shaplov.logic.ILogicParts;
 import ru.shaplov.logic.LogicDB;
+import ru.shaplov.logic.LogicParts;
 import ru.shaplov.models.Brand;
 import ru.shaplov.models.IEntity;
 import ru.shaplov.models.ITitledEntity;
@@ -27,7 +29,8 @@ import java.util.stream.Collectors;
 @WebServlet("/car_parts")
 public class CarPartsController extends HttpServlet {
 
-    private final ILogic logic = LogicDB.getInstance();
+    private final ILogicDB logic = LogicDB.getInstance();
+    private final ILogicParts logicParts = LogicParts.getInstance();
 
     private final Map<String, Function<HttpServletRequest, List<? extends IEntity>>> listsMap = new HashMap<>();
 
@@ -43,25 +46,25 @@ public class CarPartsController extends HttpServlet {
         });
         listsMap.put("body", request -> {
             int modelId = Integer.parseInt(request.getParameter("modelId"));
-            return logic.getBodyTypes(modelId);
+            return logicParts.getBodyTypes(modelId);
         });
         listsMap.put("engine", request -> {
             int modelId = Integer.parseInt(request.getParameter("modelId"));
             int bodyId = Integer.parseInt(request.getParameter("bodyId"));
-            return logic.getEngineTypes(modelId, bodyId);
+            return logicParts.getEngineTypes(modelId, bodyId);
         });
         listsMap.put("drive", request -> {
             int modelId = Integer.parseInt(request.getParameter("modelId"));
             int bodyId = Integer.parseInt(request.getParameter("bodyId"));
             int engineId = Integer.parseInt(request.getParameter("engineId"));
-            return logic.getDriveTypes(modelId, bodyId, engineId);
+            return logicParts.getDriveTypes(modelId, bodyId, engineId);
         });
         listsMap.put("trans", request -> {
             int modelId = Integer.parseInt(request.getParameter("modelId"));
             int bodyId = Integer.parseInt(request.getParameter("bodyId"));
             int engineId = Integer.parseInt(request.getParameter("engineId"));
             int driveId = Integer.parseInt(request.getParameter("driveId"));
-            return logic.getTransTypes(modelId, bodyId, engineId, driveId);
+            return logicParts.getTransTypes(modelId, bodyId, engineId, driveId);
         });
     }
 

@@ -136,20 +136,18 @@
     }
 
     $(
-        function () {
-            $("#car-brand").change(function () {
-                if ($(this).children(":selected").val() === '-1') {
-                    $("#model").hide();
-                } else {
-                    loadModel();
-                    $("#model").show();
-                }
-                $("#body").hide();
-                $("#engine").hide();
-                $("#drive").hide();
-                $("#transmission").hide();
-            })
-        }
+        $("#car-brand").change(function () {
+            if ($(this).children(":selected").val() === '-1') {
+                $("#model").hide();
+            } else {
+                loadModel();
+                $("#model").show();
+            }
+            $("#body").hide();
+            $("#engine").hide();
+            $("#drive").hide();
+            $("#transmission").hide();
+        })
     );
 
     $(
@@ -429,12 +427,12 @@
         } else {
             $("#transmission-text").removeClass("is-invalid");
         }
-        if (!file.val() || !file[0].files[0].name.match(/.(jpg|jpeg|png|gif)$/i)) {
-            $("#file").addClass("is-invalid");
-            result = false;
-        } else {
-            $("#file").removeClass("is-invalid");
-        }
+        // if (!file.val() || !file[0].files[0].name.match(/.(jpg|jpeg|png|gif)$/i)) {
+        //     $("#file").addClass("is-invalid");
+        //     result = false;
+        // } else {
+        //     $("#file").removeClass("is-invalid");
+        // }
         return result;
     }
 </script>
