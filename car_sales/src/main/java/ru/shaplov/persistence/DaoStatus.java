@@ -101,7 +101,7 @@ public class DaoStatus implements IDaoStatus {
     }
 
     @Override
-    public int getLstItemIdWithImg() {
+    public int getLastItemIdWithImg() {
         try (Session session = factory.openSession()) {
             return session.createQuery("select id from Item where picture is not null", Number.class)
                     .getSingleResult().intValue();

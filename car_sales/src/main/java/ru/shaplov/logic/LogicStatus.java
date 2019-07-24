@@ -63,6 +63,6 @@ public class LogicStatus implements ILogicStatus {
 
     @Override
     public int getLastItemIdWithImg() {
-        return dao.getLstItemIdWithImg();
+        return dao.getLastItemIdWithImg();
     }
 }

@@ -14,6 +14,6 @@ public interface IDaoStatus {
     int getItemCountForBrand(int brandId);
     int getLastItemIdForBrand(int brandId);
     int getItemCountWithImg();
-    int getLstItemIdWithImg();
+    int getLastItemIdWithImg();
     boolean isSold(int id);
 }

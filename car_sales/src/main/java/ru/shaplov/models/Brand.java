@@ -72,8 +72,7 @@ public class Brand implements ITitledEntity {
             return false;
         }
         Brand brand = (Brand) o;
-        return id == brand.id && Objects.equals(title, brand.title)
-                && Objects.equals(models, brand.models);
+        return id == brand.id && Objects.equals(title, brand.title);
     }
 
     @Override

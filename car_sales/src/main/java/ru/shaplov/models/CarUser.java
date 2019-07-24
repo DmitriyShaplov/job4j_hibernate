@@ -26,6 +26,13 @@ public class CarUser implements IEntity {
 
     private Calendar created;
 
+    public CarUser() {
+    }
+
+    public CarUser(int id) {
+        this.id = id;
+    }
+
     public Calendar getCreated() {
         return created;
     }
