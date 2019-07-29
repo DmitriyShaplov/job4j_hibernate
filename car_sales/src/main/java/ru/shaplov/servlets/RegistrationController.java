@@ -57,6 +57,7 @@ public class RegistrationController extends HttpServlet {
             errorMsg.append(System.lineSeparator());
         }
         String err = errorMsg.toString();
+        boolean success = false;
         if (!err.isEmpty()) {
             logger.info(err);
         } else {
@@ -67,6 +68,7 @@ public class RegistrationController extends HttpServlet {
                 user.setTel(tel);
                 user.setCreated(Calendar.getInstance());
                 logic.save(user);
+                success = true;
             } catch (ConstraintViolationException e) {
                 logger.info(e.getMessage(), e);
                 node.put("repeatedLogin", "error");
@@ -74,14 +76,16 @@ public class RegistrationController extends HttpServlet {
                 logger.error(e.getMessage(), e);
             }
         }
-        CarUser user = logic.authUser(login, password);
-        if (user != null) {
-            HttpSession session = req.getSession();
-            session.setAttribute("username", user.getLogin());
-            session.setAttribute("userId", user.getId());
-            node.put("username", user.getLogin());
-            node.put("userId", user.getId());
-            logger.info("User successfully registered");
+        if (success) {
+            CarUser user = logic.authUser(login, password);
+            if (user != null) {
+                HttpSession session = req.getSession();
+                session.setAttribute("username", user.getLogin());
+                session.setAttribute("userId", user.getId());
+                node.put("username", user.getLogin());
+                node.put("userId", user.getId());
+                logger.info("User successfully registered");
+            }
         }
         String json = mapper.writeValueAsString(node);
         PrintWriter out = resp.getWriter();
