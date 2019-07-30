@@ -92,17 +92,6 @@ public class CarDAO implements IDaoCrud {
         }
     }
 
-    @Override
-    public CarUser authUser(String login, String password) {
-        try (Session session = factory.openSession()) {
-            return session.createQuery("from CarUser u where u.login = :login and u.password = :password", CarUser.class)
-                    .setParameter("login", login)
-                    .setParameter("password", password).getSingleResult();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     /**
      * Get items for specified date.
      * @param date LocalDate.

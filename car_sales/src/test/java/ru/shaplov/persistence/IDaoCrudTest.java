@@ -16,6 +16,7 @@ import static org.junit.Assert.*;
 public class IDaoCrudTest {
 
     private final IDaoCrud dao = CarDAO.getInstance();
+    private final IDaoUser daoUser = DaoUser.getInstance();
 
     @Test
     public void whenAddUserThenNewUser() {
@@ -127,8 +128,8 @@ public class IDaoCrudTest {
         CarUser user = new CarUser();
         user.setLogin("test auth");
         user.setPassword("test password");
-        dao.save(user);
-        assertThat(dao.authUser("test auth", "test password"), is(user));
+        daoUser.save(user);
+        assertThat(daoUser.authUser("test auth", "test password"), is(user));
     }
 
     @Test
@@ -136,7 +137,7 @@ public class IDaoCrudTest {
         CarUser user = new CarUser();
         user.setLogin("test auth false");
         user.setPassword("test password");
-        dao.save(user);
-        assertNull(dao.authUser("test auth false", "wrong password"));
+        daoUser.save(user);
+        assertNull(daoUser.authUser("test auth false", "wrong password"));
     }
 }

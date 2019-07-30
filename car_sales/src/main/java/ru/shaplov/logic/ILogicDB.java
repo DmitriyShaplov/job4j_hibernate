@@ -18,5 +18,4 @@ public interface ILogicDB {
     List<IEntity> getItemsForDate(LocalDate date);
     List<IEntity> getItemsForBrand(int brandId);
     List<IEntity> getItemsWithImg();
-    CarUser authUser(String login, String password);
 }

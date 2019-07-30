@@ -63,9 +63,4 @@ public class LogicDB implements ILogicDB {
     public List<IEntity> getItemsWithImg() {
         return dao.getItemsWithImg();
     }
-
-    @Override
-    public CarUser authUser(String login, String password) {
-        return dao.authUser(login, password);
-    }
 }
