@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add item</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
+</head>
+<style>
+    .header {
+        border-bottom: 1px solid lightgrey;
+        width: 100%;
+        font-size: 24px;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+    }
+    .body {
+        width: 80%;
+    }
+
+    .container {
+        min-width: 800px;
+    }
+
+    .b-hover:hover {
+        cursor: pointer;
+    }
+
+    .pointer:hover {
+        cursor: pointer;
+    }
+
+</style>
+<body>
+<div class="container">
+    <div class="header"><i class="far fa-clipboard"></i> Новое объявление</div>
+    <div class="body">
+        <form id="data" action="additem" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="item-name">Название объявления</label>
+                <input type="text" class="form-control" id="item-name" name="name" placeholder="Введите название"/>
+            </div>
+            <div>
+                <h4>Технические характеристики</h4>
+            </div>
+            <div id="brand" class="form-group row">
+                <label for="car-brand" class="col-sm-3 col-form-label">Марка</label>
+                <div class="col-sm-9">
+                    <select class="form-control" id="car-brand" name="brand">
+                        <option value = '-1'>-</option>
+                    </select>
+                </div>
+            </div>
+            <div id="model" class="form-group row" style="display: none">
+                <label for="car-model" class="col-sm-3 col-form-label">Модель</label>
+                <div class="col-sm-9">
+                    <select class="form-control" id="car-model" name="model">
+                        <option value = '-1'>-</option>
+                    </select>
+                </div>
+            </div>
+            <div id="body" class="form-group row" style="display: none">
+                <label for="body-type" class="col-sm-3 col-form-label">Тип кузова</label>
+                <div class="col-sm-9">
+                    <div class="btn-group" role="group" id="body-type" aria-label="Basic example" data-toggle="buttons">
+                    </div>
+                    <input type="text" id="body-text" class="form-control" style="display: none">
+                    <div class="invalid-feedback" style="margin-top: -8px; margin-bottom: -8px">
+                        Please choose car body.
+                    </div>
+                </div>
+            </div>
+            <div id="engine" class="form-group row" style="display: none">
+                <label for="engine-type" class="col-sm-3 col-form-label">Тип двигателя</label>
+                <div class="col-sm-9">
+                    <div class="btn-group" role="group" id="engine-type" aria-label="Basic example" data-toggle="buttons">
+                    </div>
+                    <input type="text" id="engine-text" class="form-control" style="display: none">
+                    <div class="invalid-feedback" style="margin-top: -8px; margin-bottom: -8px">
+                        Please choose engine.
+                    </div>
+                </div>
+            </div>
+            <div id="drive" class="form-group row" style="display: none">
+                <label for="drive-type" class="col-sm-3 col-form-label">Привод</label>
+                <div class="col-sm-9">
+                    <div class="btn-group" role="group" id="drive-type" aria-label="Basic example" data-toggle="buttons">
+                    </div>
+                    <input type="text" id="drive-text" class="form-control" style="display: none">
+                    <div class="invalid-feedback" style="margin-top: -8px; margin-bottom: -8px">
+                        Please choose drive.
+                    </div>
+                </div>
+            </div>
+            <div id="transmission" class="form-group row" style="display: none">
+                <label for="transmission-type" class="col-sm-3 col-form-label">Коробка передач</label>
+                <div class="col-sm-9">
+                    <div class="btn-group" role="group" id="transmission-type" aria-label="Basic example" data-toggle="buttons">
+                    </div>
+                    <input type="text" id="transmission-text" class="form-control" style="display: none">
+                    <div class="invalid-feedback" style="margin-top: -8px; margin-bottom: -8px">
+                        Please choose transmission.
+                    </div>
+                </div>
+            </div>
+            <div class="custom-file" style="margin-bottom: 20px">
+                <input type="file" class="custom-file-input pointer" id="file" name="file" accept="image/*">
+                <label class="custom-file-label pointer" for="file">Выберите картинку</label>
+                <div class="invalid-feedback">
+                    Please choose car image.
+                </div>
+            </div>
+            <button type="submit" class="btn btn-outline-success" style="float: right" onclick="return validate()">Отправить объявление</button>
+        </form>
+    </div>
+</div>
+</body>
+<script>
+    $(function () {
+        bsCustomFileInput.init()
+    });
+
+    $(loadBrand());
+
+    function clearBtnsValid() {
+        $("#body-text").removeClass("is-invalid");
+        $("#engine-text").removeClass("is-invalid");
+        $("#drive-text").removeClass("is-invalid");
+        $("#transmission-text").removeClass("is-invalid");
+    }
+
+    $(
+        $("#car-brand").change(function () {
+            if ($(this).children(":selected").val() === '-1') {
+                $("#model").hide();
+            } else {
+                loadModel();
+                $("#model").show();
+            }
+            $("#body").hide();
+            $("#engine").hide();
+            $("#drive").hide();
+            $("#transmission").hide();
+        })
+    );
+
+    $(
+        function () {
+            $("#car-model").change(function () {
+                if ($(this).children(":selected").val() === '-1') {
+                    $("#body").hide();
+                } else {
+                    loadBody();
+                    $("#body").show();
+                }
+                clearBtnsValid();
+                $("#engine").hide();
+                $("#drive").hide();
+                $("#transmission").hide();
+            })
+        }
+    );
+
+    $(".body").on("change", "[name='body-type-options']:checked",function () {
+        loadEngine();
+        clearBtnsValid();
+        $("#engine").show();
+        $("#drive").hide();
+        $("#transmission").hide();
+    });
+
+    $(".body").on("change", "[name='engine-type-options']:checked",function () {
+        loadDrive();
+        clearBtnsValid();
+        $("#drive").show();
+        $("#transmission").hide();
+    });
+
+    $(".body").on("change", "[name='drive-type-options']:checked",function () {
+        loadTrans();
+        clearBtnsValid();
+        $("#transmission").show();
+    });
+
+    $(".body").on("change", "[name='transmission-type-options']:checked",function () {
+        $("#transmission-text").removeClass("is-invalid");
+    });
+
+    function loadBrand() {
+        $.ajax("./car_parts", {
+            type: "get",
+            data: "type=brand",
+            dataType: "json"
+        }).done(function (values) {
+            var result = "";
+            result += "<option selected value='-1'>-</option>";
+            values.forEach(function (value) {
+                result += "<option value='" + value.id + "'>" + value.title + "</option>";
+            });
+            $("#car-brand").html(result);
+        });
+    }
+
+    function loadModel() {
+        var brandId = $("#car-brand").children(":selected").val();
+        if (brandId === '-1') {
+            $("#car-model").html("<option selected value = '-1'>-</option>");
+            return;
+        }
+        $.ajax("./car_parts", {
+            type: "get",
+            data: {
+                type: "model",
+                brandId: brandId
+            },
+            dataType: "json"
+        }).done(function (values) {
+            var result = "";
+            result += "<option selected value = '-1'>-</option>";
+            values.forEach(function (value) {
+                result += "<option value='" + value.id + "'>" + value.title + "</option>";
+            });
+            $("#car-model").html(result);
+        });
+    }
+
+    function loadBody() {
+        var modelId = $("#car-model").children(":selected").val();
+        if (modelId === '-1') {
+            return;
+        }
+        $.ajax("./car_parts", {
+            type: "get",
+            data: {
+                type: "body",
+                modelId: modelId
+            },
+            dataType: "json"
+        }).done(function (values) {
+            var result = "";
+            if (values.length === 1) {
+                result += "<label class=\"btn btn-outline-secondary b-hover active\"><input type=\"radio\" checked style=\"display: none\" name=\"body-type-options\""
+                    + " value='" + values[0].id + "'>" +
+                    values[0].title + "</label>";
+                $("#body-type").html(result);
+                loadEngine();
+                $("#engine").show();
+            } else {
+                values.forEach(function (value) {
+                    result += "<label class=\"btn btn-outline-secondary b-hover\"><input type=\"radio\" style=\"display: none\" name=\"body-type-options\""
+                        + " value='" + value.id + "'>" +
+                        value.title + "</label>";
+                });
+                $("#body-type").html(result);
+            }
+        });
+    }
+
+    function loadEngine() {
+        var modelId = $("#car-model").children(":selected").val();
+        var bodyId = $("[name='body-type-options']:checked").val();
+        if (modelId === '-1' || bodyId === undefined) {
+            return;
+        }
+        $.ajax("./car_parts", {
+            type: "get",
+            data: {
+                type: "engine",
+                bodyId: bodyId,
+                modelId: modelId
+            },
+            dataType: "json"
+        }).done(function (values) {
+            var result = "";
+            if (values.length === 1) {
+                result += "<label class=\"btn btn-outline-secondary b-hover active\"><input type=\"radio\" checked style=\"display: none\" name=\"engine-type-options\""
+                    + " value='" + values[0].id + "'>" +
+                    values[0].title + "</label>";
+                $("#engine-type").html(result);
+                loadDrive();
+                $("#drive").show();
+            } else {
+                values.forEach(function (value) {
+                    result += "<label class=\"btn btn-outline-secondary b-hover\"><input type=\"radio\" style=\"display: none\" name=\"engine-type-options\""
+                        + " value='" + value.id + "'>" +
+                        value.title + "</label>"
+                });
+                $("#engine-type").html(result);
+            }
+        });
+    }
+
+    function loadDrive() {
+        var modelId = $("#car-model").children(":selected").val();
+        var bodyId = $("[name='body-type-options']:checked").val();
+        var engineId = $("[name='engine-type-options']:checked").val();
+        if (modelId === '-1' || bodyId === undefined || engineId === undefined) {
+            return;
+        }
+        $.ajax("./car_parts", {
+            type: "get",
+            data: {
+                type: "drive",
+                modelId: modelId,
+                bodyId: bodyId,
+                engineId: engineId
+            },
+            dataType: "json"
+        }).done(function (values) {
+            var result = "";
+            if (values.length === 1) {
+                result += "<label class=\"btn btn-outline-secondary b-hover active\"><input type=\"radio\" checked style=\"display: none\" name=\"drive-type-options\""
+                    + " value='" + values[0].id + "'>" +
+                    values[0].title + "</label>";
+                $("#drive-type").html(result);
+                loadTrans();
+                $("#transmission").show();
+            } else {
+                values.forEach(function (value) {
+                    result += "<label class=\"btn btn-outline-secondary b-hover\"><input type=\"radio\" style=\"display: none\" name=\"drive-type-options\""
+                        + " value='" + value.id + "'>" +
+                        value.title + "</label>";
+                });
+                $("#drive-type").html(result);
+            }
+        });
+    }
+
+    function loadTrans() {
+        var driveId = $("[name='drive-type-options']:checked").val();
+        var modelId = $("#car-model").children(":selected").val();
+        var bodyId = $("[name='body-type-options']:checked").val();
+        var engineId = $("[name='engine-type-options']:checked").val();
+        if (modelId === '-1' || driveId === undefined
+            || bodyId === undefined || engineId === undefined) {
+            return;
+        }
+        $.ajax("./car_parts", {
+            type: "get",
+            data: {
+                type: "trans",
+                modelId: modelId,
+                bodyId: bodyId,
+                engineId: engineId,
+                driveId: driveId
+            },
+            dataType: "json"
+        }).done(function (values) {
+            var result = "";
+            if (values.length === 1) {
+                result += "<label class=\"btn btn-outline-secondary b-hover active\"><input type=\"radio\" checked style=\"display: none\" name=\"transmission-type-options\""
+                    + " value='" + values[0].id + "'>" +
+                    values[0].title + "</label>"
+                $("#transmission-type").html(result);
+            } else {
+                values.forEach(function (value) {
+                    result += "<label class=\"btn btn-outline-secondary b-hover\"><input type=\"radio\" style=\"display: none\" name=\"transmission-type-options\""
+                        + " value='" + value.id + "'>" +
+                        value.title + "</label>"
+                });
+                $("#transmission-type").html(result);
+            }
+        });
+    }
+
+    function validate() {
+        var result = true;
+        var itemName = $("#item-name");
+        var brand = $("#car-brand");
+        var model = $("#car-model");
+        var driveId = $("[name='drive-type-options']:checked").val();
+        var bodyId = $("[name='body-type-options']:checked").val();
+        var engineId = $("[name='engine-type-options']:checked").val();
+        var transId = $("[name='transmission-type-options']:checked").val();
+        var error = "";
+        var file = $("#file");
+        if (itemName.val() === "") {
+            itemName.removeClass("is-valid").addClass("is-invalid");
+        } else {
+            itemName.removeClass("is-invalid").addClass("is-valid");
+        }
+        if (brand.children(":selected").val() === '-1') {
+            brand.removeClass("is-valid").addClass("is-invalid");
+        } else {
+            brand.removeClass("is-invalid").addClass("is-valid");
+        }
+        if (model.children(":selected").val() === '-1') {
+            model.removeClass("is-valid").addClass("is-invalid");
+        } else {
+            model.removeClass("is-invalid").addClass("is-valid");
+        }
+        if (bodyId === undefined) {
+            if ($("#body").css("display") !== "none") {
+                $("#body-text").addClass("is-invalid");
+            }
+            result = false;
+        } else {
+            $("#body-text").removeClass("is-invalid");
+        }
+        if (engineId === undefined) {
+            if ($("#engine").css("display") !== "none") {
+                $("#engine-text").addClass("is-invalid");
+            }
+            result = false;
+        } else {
+            $("#engine-text").removeClass("is-invalid");
+        }
+        if (driveId === undefined) {
+            if ($("#drive").css("display") !== "none") {
+                $("#drive-text").addClass("is-invalid");
+            }
+            result = false;
+        } else {
+            $("#drive-text").removeClass("is-invalid");
+        }
+        if (transId === undefined) {
+            if ($("#transmission").css("display") !== "none") {
+                $("#transmission-text").addClass("is-invalid");
+            }
+            result = false;
+        } else {
+            $("#transmission-text").removeClass("is-invalid");
+        }
+        // if (!file.val() || !file[0].files[0].name.match(/.(jpg|jpeg|png|gif)$/i)) {
+        //     $("#file").addClass("is-invalid");
+        //     result = false;
+        // } else {
+        //     $("#file").removeClass("is-invalid");
+        // }
+        return result;
+    }
+</script>
+</html>
