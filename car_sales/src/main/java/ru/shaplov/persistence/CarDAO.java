@@ -3,6 +3,7 @@ package ru.shaplov.persistence;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.springframework.stereotype.Repository;
 import ru.shaplov.models.*;
 import ru.shaplov.util.HibernateUtil;
 
@@ -14,17 +15,12 @@ import java.util.function.Function;
  * @author shaplov
  * @since 13.07.2019
  */
+@Repository
 public class CarDAO implements IDaoCrud {
-
-    private final static CarDAO INSTANCE = new CarDAO();
 
     private final SessionFactory factory = HibernateUtil.getInstance().getSessionFactory();
 
     private CarDAO() {
-    }
-
-    public static CarDAO getInstance() {
-        return INSTANCE;
     }
 
     private <T> T transaction(Function<Session, T> command) {
@@ -133,5 +129,10 @@ public class CarDAO implements IDaoCrud {
                     .setParameter("brandId", brandId)
                     .getResultList();
         }
+    }
+
+    public static void main(String[] args) {
+        CarDAO dao = new CarDAO();
+        System.out.println(dao.getList("Item"));
     }
 }

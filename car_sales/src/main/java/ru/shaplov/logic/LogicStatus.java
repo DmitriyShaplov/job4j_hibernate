@@ -1,5 +1,7 @@
 package ru.shaplov.logic;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import ru.shaplov.persistence.DaoStatus;
 
 import java.time.LocalDate;
@@ -8,17 +10,14 @@ import java.time.LocalDate;
  * @author shaplov
  * @since 23.07.2019
  */
+@Service
 public class LogicStatus implements ILogicStatus {
 
-    private final static LogicStatus INSTANCE = new LogicStatus();
+    private final DaoStatus dao;
 
-    private final DaoStatus dao = DaoStatus.getInstance();
-
-    private LogicStatus() {
-    }
-
-    public static LogicStatus getInstance() {
-        return INSTANCE;
+    @Autowired
+    private LogicStatus(DaoStatus dao) {
+        this.dao = dao;
     }
 
     @Override

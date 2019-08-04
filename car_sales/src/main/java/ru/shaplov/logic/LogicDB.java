@@ -1,7 +1,8 @@
 package ru.shaplov.logic;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import ru.shaplov.models.*;
-import ru.shaplov.persistence.CarDAO;
 import ru.shaplov.persistence.IDaoCrud;
 
 import java.time.LocalDate;
@@ -11,17 +12,14 @@ import java.util.List;
  * @author shaplov
  * @since 14.07.2019
  */
+@Service
 public class LogicDB implements ILogicDB {
 
-    private final static LogicDB INSTANCE = new LogicDB();
+    private final IDaoCrud dao;
 
-    private final IDaoCrud dao = CarDAO.getInstance();
-
-    private LogicDB() {
-    }
-
-    public static LogicDB getInstance() {
-        return INSTANCE;
+    @Autowired
+    private LogicDB(IDaoCrud dao) {
+        this.dao = dao;
     }
 
     @Override

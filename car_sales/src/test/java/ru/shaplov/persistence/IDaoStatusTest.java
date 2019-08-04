@@ -2,6 +2,10 @@ package ru.shaplov.persistence;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import ru.shaplov.config.TestConfig;
+import ru.shaplov.config.WebConfig;
 import ru.shaplov.models.Brand;
 import ru.shaplov.models.Item;
 
@@ -13,8 +17,9 @@ import static org.junit.Assert.*;
 
 public class IDaoStatusTest {
 
-    private final IDaoCrud dao = CarDAO.getInstance();
-    private final IDaoStatus daoStatus = DaoStatus.getInstance();
+    private final ApplicationContext ctx = new AnnotationConfigApplicationContext(TestConfig.class);
+    private final IDaoCrud dao = ctx.getBean(IDaoCrud.class);
+    private final IDaoStatus daoStatus = ctx.getBean(IDaoStatus.class);
 
     @Before
     public void clearItems() {

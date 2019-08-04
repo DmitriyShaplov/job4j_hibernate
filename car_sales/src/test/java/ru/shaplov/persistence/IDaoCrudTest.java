@@ -1,6 +1,10 @@
 package ru.shaplov.persistence;
 
 import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import ru.shaplov.config.TestConfig;
+import ru.shaplov.config.WebConfig;
 import ru.shaplov.models.Brand;
 import ru.shaplov.models.CarUser;
 import ru.shaplov.models.IEntity;
@@ -15,8 +19,9 @@ import static org.junit.Assert.*;
 
 public class IDaoCrudTest {
 
-    private final IDaoCrud dao = CarDAO.getInstance();
-    private final IDaoUser daoUser = DaoUser.getInstance();
+    private final ApplicationContext ctx = new AnnotationConfigApplicationContext(TestConfig.class);
+    private final IDaoCrud dao = ctx.getBean(IDaoCrud.class);
+    private final IDaoUser daoUser = ctx.getBean(IDaoUser.class);
 
     @Test
     public void whenAddUserThenNewUser() {

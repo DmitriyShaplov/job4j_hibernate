@@ -2,6 +2,10 @@ package ru.shaplov.persistence;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import ru.shaplov.config.TestConfig;
+import ru.shaplov.config.WebConfig;
 import ru.shaplov.models.*;
 
 import static org.hamcrest.core.Is.is;
@@ -9,8 +13,9 @@ import static org.junit.Assert.*;
 
 public class IDaoPartsTest {
 
-    private final IDaoCrud dao = CarDAO.getInstance();
-    private final IDaoParts daoParts = DaoParts.getInstance();
+    private final ApplicationContext ctx = new AnnotationConfigApplicationContext(TestConfig.class);
+    private final IDaoCrud dao = ctx.getBean(IDaoCrud.class);
+    private final IDaoParts daoParts = ctx.getBean(IDaoParts.class);
 
     private int modelId;
     private int bodyId;

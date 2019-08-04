@@ -2,6 +2,7 @@ package ru.shaplov.persistence;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 import ru.shaplov.util.HibernateUtil;
 
 import java.time.LocalDate;
@@ -10,17 +11,12 @@ import java.time.LocalDate;
  * @author shaplov
  * @since 23.07.2019
  */
+@Repository
 public class DaoStatus implements IDaoStatus {
-
-    private static final DaoStatus INSTANCE = new DaoStatus();
 
     private final SessionFactory factory = HibernateUtil.getInstance().getSessionFactory();
 
     private DaoStatus() {
-    }
-
-    public static DaoStatus getInstance() {
-        return INSTANCE;
     }
 
     @Override

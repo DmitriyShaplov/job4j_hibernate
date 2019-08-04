@@ -1,5 +1,7 @@
 package ru.shaplov.logic;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import ru.shaplov.models.ITitledEntity;
 import ru.shaplov.persistence.DaoParts;
 
@@ -9,17 +11,14 @@ import java.util.List;
  * @author shaplov
  * @since 23.07.2019
  */
+@Service
 public class LogicParts implements ILogicParts {
 
-    private final static LogicParts INSTANCE = new LogicParts();
+    private final DaoParts daoParts;
 
-    private final DaoParts daoParts = DaoParts.getInstance();
-
-    private LogicParts() {
-    }
-
-    public static LogicParts getInstance() {
-        return INSTANCE;
+    @Autowired
+    private LogicParts(DaoParts daoParts) {
+        this.daoParts = daoParts;
     }
 
     @Override

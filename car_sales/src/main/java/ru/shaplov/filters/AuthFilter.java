@@ -1,7 +1,6 @@
 package ru.shaplov.filters;
 
 import javax.servlet.*;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -11,7 +10,6 @@ import java.io.IOException;
  * @author shaplov
  * @since 18.07.2019
  */
-@WebFilter("/AuthFilter")
 public class AuthFilter implements Filter {
 
     @Override

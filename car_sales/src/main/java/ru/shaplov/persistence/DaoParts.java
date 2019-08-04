@@ -2,6 +2,7 @@ package ru.shaplov.persistence;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 import ru.shaplov.models.ITitledEntity;
 import ru.shaplov.util.HibernateUtil;
 
@@ -11,16 +12,12 @@ import java.util.List;
  * @author shaplov
  * @since 23.07.2019
  */
+@Repository
 public class DaoParts implements IDaoParts {
-    private final static DaoParts INSTANCE = new DaoParts();
 
     private final SessionFactory factory = HibernateUtil.getInstance().getSessionFactory();
 
     private DaoParts() {
-    }
-
-    public static DaoParts getInstance() {
-        return INSTANCE;
     }
 
     /**

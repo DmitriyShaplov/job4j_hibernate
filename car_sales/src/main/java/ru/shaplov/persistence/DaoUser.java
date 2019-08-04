@@ -3,6 +3,7 @@ package ru.shaplov.persistence;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.springframework.stereotype.Repository;
 import ru.shaplov.models.CarUser;
 import ru.shaplov.util.HibernateUtil;
 
@@ -10,17 +11,12 @@ import ru.shaplov.util.HibernateUtil;
  * @author shaplov
  * @since 30.07.2019
  */
+@Repository
 public class DaoUser implements IDaoUser {
-
-    private static final DaoUser INSTANCE = new DaoUser();
 
     private final SessionFactory factory = HibernateUtil.getInstance().getSessionFactory();
 
     private DaoUser() {
-    }
-
-    public static DaoUser getInstance() {
-        return INSTANCE;
     }
 
     @Override
