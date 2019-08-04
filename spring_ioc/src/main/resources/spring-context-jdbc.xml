@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-                           http://www.springframework.org/schema/beans/spring-beans.xsd">
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <bean id="storage" class="ru.shaplov.storages.JdbcStorage"/>
+    <bean id="storage" class="ru.shaplov.storages.JdbcStorage">
+        <constructor-arg name="url" value="${url}"/>
+        <constructor-arg name="username" value="${user}"/>
+        <constructor-arg name="password" value="${password}"/>
+        <constructor-arg name="driver" value="${driver}"/>
+        <constructor-arg name="maxIdle" value="${max_idle}"/>
+        <constructor-arg name="minIdle" value="${min_idle}"/>
+        <constructor-arg name="maxPs" value="${max_ps}"/>
+    </bean>
     <bean id="import" class="ru.shaplov.storages.ImportUser">
         <constructor-arg name="storage" ref="storage"/>
     </bean>
+    <context:property-placeholder location="classpath:app.properties" />
 </beans>

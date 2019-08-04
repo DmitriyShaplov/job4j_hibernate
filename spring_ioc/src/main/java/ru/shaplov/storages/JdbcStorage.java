@@ -4,9 +4,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.InputStream;
 import java.sql.*;
-import java.util.Properties;
 
 /**
  * @author shaplov
@@ -17,24 +15,15 @@ public class JdbcStorage implements Storage {
     private static final Logger LOG = LogManager.getLogger(JdbcStorage.class);
     private static final BasicDataSource SOURCE = new BasicDataSource();
 
-    public JdbcStorage() {
-        try (InputStream in = JdbcStorage.class.getClassLoader().getResourceAsStream("app.properties")) {
-            if (in == null) {
-                throw new IllegalStateException("properties are null");
-            }
-            Properties config = new Properties();
-            config.load(in);
-            SOURCE.setUrl(config.getProperty("url"));
-            SOURCE.setUsername(config.getProperty("username"));
-            SOURCE.setPassword(config.getProperty("password"));
-            SOURCE.setDriverClassName(config.getProperty("driver"));
-            SOURCE.setMinIdle(Integer.parseInt(config.getProperty("min_idle")));
-            SOURCE.setMaxIdle(Integer.parseInt(config.getProperty("max_idle")));
-            SOURCE.setMaxOpenPreparedStatements(Integer.parseInt(config.getProperty("max_ps")));
-        } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-            throw new IllegalStateException("could not get properties");
-        }
+    public JdbcStorage(String url, String username, String password,
+                       String driver, String minIdle, String maxIdle, String maxPs) {
+        SOURCE.setUrl(url);
+        SOURCE.setUsername(username);
+        SOURCE.setPassword(password);
+        SOURCE.setDriverClassName(driver);
+        SOURCE.setMinIdle(Integer.parseInt(minIdle));
+        SOURCE.setMaxIdle(Integer.parseInt(maxIdle));
+        SOURCE.setMaxOpenPreparedStatements(Integer.parseInt(maxPs));
     }
 
     @Override
