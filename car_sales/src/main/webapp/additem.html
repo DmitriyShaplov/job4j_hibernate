@@ -378,20 +378,22 @@
         var bodyId = $("[name='body-type-options']:checked").val();
         var engineId = $("[name='engine-type-options']:checked").val();
         var transId = $("[name='transmission-type-options']:checked").val();
-        var error = "";
         var file = $("#file");
         if (itemName.val() === "") {
             itemName.removeClass("is-valid").addClass("is-invalid");
+            result = false;
         } else {
             itemName.removeClass("is-invalid").addClass("is-valid");
         }
         if (brand.children(":selected").val() === '-1') {
             brand.removeClass("is-valid").addClass("is-invalid");
+            result = false;
         } else {
             brand.removeClass("is-invalid").addClass("is-valid");
         }
         if (model.children(":selected").val() === '-1') {
             model.removeClass("is-valid").addClass("is-invalid");
+            result = false;
         } else {
             model.removeClass("is-invalid").addClass("is-valid");
         }
@@ -427,12 +429,12 @@
         } else {
             $("#transmission-text").removeClass("is-invalid");
         }
-        // if (!file.val() || !file[0].files[0].name.match(/.(jpg|jpeg|png|gif)$/i)) {
-        //     $("#file").addClass("is-invalid");
-        //     result = false;
-        // } else {
-        //     $("#file").removeClass("is-invalid");
-        // }
+        if (file.val() && !file[0].files[0].name.match(/.(jpg|jpeg|png|gif)$/i)) {
+            $("#file").addClass("is-invalid");
+            result = false;
+        } else {
+            $("#file").removeClass("is-invalid");
+        }
         return result;
     }
 </script>

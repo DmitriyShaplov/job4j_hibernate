@@ -1,7 +1,8 @@
 package ru.shaplov.models;
 
 import javax.persistence.*;
-import java.util.Calendar;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 /**
@@ -22,7 +23,7 @@ public class Item implements ITitledEntity {
 
     private boolean sold;
 
-    private Calendar created;
+    private LocalDateTime created;
 
     @ManyToOne
     @JoinColumn(name = "car_users_id")
@@ -75,7 +76,7 @@ public class Item implements ITitledEntity {
         return sold;
     }
 
-    public Calendar getCreated() {
+    public LocalDateTime getCreated() {
         return created;
     }
 
@@ -123,7 +124,7 @@ public class Item implements ITitledEntity {
         this.sold = sold;
     }
 
-    public void setCreated(Calendar created) {
+    public void setCreated(LocalDateTime created) {
         this.created = created;
     }
 
@@ -163,10 +164,17 @@ public class Item implements ITitledEntity {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+
         Item item = (Item) o;
+        LocalDateTime createdTrunc = null;
+        LocalDateTime createdTruncObj = null;
+        if (created != null && item.created != null) {
+            createdTrunc = created.truncatedTo(ChronoUnit.MILLIS);
+            createdTruncObj = item.created.truncatedTo(ChronoUnit.MILLIS);
+        }
         return id == item.id && sold == item.sold
                 && Objects.equals(title, item.title)
-                && Objects.equals(created, item.created)
+                && Objects.equals(createdTrunc, createdTruncObj)
                 && Objects.equals(user, item.user)
                 && Objects.equals(brand, item.brand)
                 && Objects.equals(model, item.model)

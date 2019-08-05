@@ -4,18 +4,23 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import ru.shaplov.config.TestConfig;
-import ru.shaplov.config.WebConfig;
+import ru.shaplov.config.DataJpaConfig;
 import ru.shaplov.models.*;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 public class IDaoPartsTest {
 
-    private final ApplicationContext ctx = new AnnotationConfigApplicationContext(TestConfig.class);
-    private final IDaoCrud dao = ctx.getBean(IDaoCrud.class);
-    private final IDaoParts daoParts = ctx.getBean(IDaoParts.class);
+    private final ApplicationContext ctx = new AnnotationConfigApplicationContext(DataJpaConfig.class);
+    private final CarPartsRepository daoParts = ctx.getBean(CarPartsRepository.class);
+    private final BrandRepository daoBrand = ctx.getBean(BrandRepository.class);
+    private final ModelRepository daoModel = ctx.getBean(ModelRepository.class);
+    private final BodyTypeRepository daoBody = ctx.getBean(BodyTypeRepository.class);
+    private final EngineTypeRepository daoEngine = ctx.getBean(EngineTypeRepository.class);
+    private final DriveTypeRepository daoDrive = ctx.getBean(DriveTypeRepository.class);
+    private final TransTypeRepository daoTrans = ctx.getBean(TransTypeRepository.class);
+    private final UnifyingRepository daoUni = ctx.getBean(UnifyingRepository.class);
 
     private int modelId;
     private int bodyId;
@@ -26,34 +31,34 @@ public class IDaoPartsTest {
     public void init() {
         Brand brand = new Brand();
         brand.setTitle("brand");
-        brand = (Brand) dao.save(brand);
+        brand = daoBrand.save(brand);
         Model model = new Model();
         model.setTitle("model");
         model.setBrand(brand);
-        model = (Model) dao.save(model);
+        model = daoModel.save(model);
         modelId = model.getId();
         BodyType body = new BodyType();
         body.setTitle("body");
-        body = (BodyType) dao.save(body);
+        body = daoBody.save(body);
         bodyId = body.getId();
         EngineType engine = new EngineType();
         engine.setTitle("engine");
-        engine = (EngineType) dao.save(engine);
+        engine = daoEngine.save(engine);
         engineId = engine.getId();
         DriveType drive = new DriveType();
         drive.setTitle("drive");
-        drive = (DriveType) dao.save(drive);
+        drive = daoDrive.save(drive);
         driveId = drive.getId();
         TransType trans = new TransType();
         trans.setTitle("trans");
-        trans = (TransType) dao.save(trans);
+        trans = daoTrans.save(trans);
         Unifying unifying = new Unifying();
         unifying.setModel(model);
         unifying.setBody(body);
         unifying.setEngine(engine);
         unifying.setDrive(drive);
         unifying.setTrans(trans);
-        dao.save(unifying);
+        daoUni.save(unifying);
     }
 
     @Test

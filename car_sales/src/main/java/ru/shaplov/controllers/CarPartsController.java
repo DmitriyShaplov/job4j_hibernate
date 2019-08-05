@@ -1,12 +1,11 @@
 package ru.shaplov.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import ru.shaplov.logic.ILogicDB;
+import ru.shaplov.logic.ILogicItem;
 import ru.shaplov.logic.ILogicParts;
 import ru.shaplov.models.Brand;
 import ru.shaplov.models.IEntity;
@@ -25,21 +24,16 @@ import java.util.stream.Collectors;
 @Controller
 public class CarPartsController {
 
-    private final ILogicDB logic;
-    private final ILogicParts logicParts;
-
     private final Map<String, Function<Map<String, String>, List<? extends IEntity>>> listsMap = new HashMap<>();
 
     @Autowired
-    public CarPartsController(ILogicDB logic, ILogicParts logicParts) {
-        this.logic = logic;
-        this.logicParts = logicParts;
+    public CarPartsController(ILogicParts logicParts) {
         listsMap.put("brand", request ->
-                logic.getList("Brand")
+                logicParts.findAllBrand()
         );
         listsMap.put("model", params -> {
             int brandId = Integer.parseInt(params.get("brandId"));
-            Brand brand = (Brand) logic.get(new Brand(brandId));
+            Brand brand = logicParts.getBrandById(brandId);
             return brand.getModels();
         });
         listsMap.put("body", params -> {
@@ -70,12 +64,10 @@ public class CarPartsController {
     @ResponseBody
     protected List<MappedObj> getPart(@RequestParam Map<String, String> params) {
         String type = params.get("type");
-        ObjectMapper mapper = new ObjectMapper();
         List<? extends IEntity> list = listsMap.get(type).apply(params);
-        List<MappedObj> res = list.stream()
+        return list.stream()
                 .map(v -> new MappedObj(v.getId(), ((ITitledEntity) v).getTitle()))
                 .collect(Collectors.toList());
-        return res;
     }
 
     /**
@@ -89,9 +81,6 @@ public class CarPartsController {
         private MappedObj(int id, String title) {
             this.id = id;
             this.title = title;
-        }
-
-        public MappedObj() {
         }
 
         public int getId() {

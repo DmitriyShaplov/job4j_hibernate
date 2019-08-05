@@ -3,33 +3,31 @@ package ru.shaplov.persistence;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import ru.shaplov.config.TestConfig;
-import ru.shaplov.config.WebConfig;
+import ru.shaplov.config.DataJpaConfig;
 import ru.shaplov.models.Brand;
 import ru.shaplov.models.CarUser;
-import ru.shaplov.models.IEntity;
 import ru.shaplov.models.Item;
 
 import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.List;
+import java.time.LocalDateTime;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 public class IDaoCrudTest {
 
-    private final ApplicationContext ctx = new AnnotationConfigApplicationContext(TestConfig.class);
-    private final IDaoCrud dao = ctx.getBean(IDaoCrud.class);
-    private final IDaoUser daoUser = ctx.getBean(IDaoUser.class);
+    private final ApplicationContext ctx = new AnnotationConfigApplicationContext(DataJpaConfig.class);
+    private final ItemRepository dao = ctx.getBean(ItemRepository.class);
+    private final UserRepository daoUser = ctx.getBean(UserRepository.class);
+    private final BrandRepository daoBrand = ctx.getBean(BrandRepository.class);
 
     @Test
     public void whenAddUserThenNewUser() {
         CarUser user = new CarUser();
         user.setLogin("test login");
         user.setPassword("test password");
-        user = (CarUser) dao.save(user);
-        assertThat(dao.get(new CarUser(user.getId())), is(user));
+        user = daoUser.save(user);
+        assertThat(daoUser.findById(user.getId()).orElse(null), is(user));
     }
 
     @Test
@@ -37,10 +35,10 @@ public class IDaoCrudTest {
         CarUser user = new CarUser();
         user.setLogin("test login 1");
         user.setPassword("test password");
-        user = (CarUser) dao.save(user);
+        user = daoUser.save(user);
         user.setLogin("test login updated");
-        dao.update(user);
-        assertThat(((CarUser) dao.get(new CarUser(user.getId()))).getLogin(), is("test login updated"));
+        daoUser.save(user);
+        assertThat(daoUser.findById(user.getId()).orElseThrow().getLogin(), is("test login updated"));
     }
 
     @Test
@@ -48,9 +46,9 @@ public class IDaoCrudTest {
         CarUser user = new CarUser();
         user.setLogin("test login delete");
         user.setPassword("test password");
-        user = (CarUser) dao.save(user);
-        dao.delete(user);
-        assertNull(dao.get(user));
+        user = daoUser.save(user);
+        daoUser.delete(user);
+        assertTrue(daoUser.findById(user.getId()).isEmpty());
     }
 
     @Test
@@ -58,8 +56,8 @@ public class IDaoCrudTest {
         CarUser user = new CarUser();
         user.setLogin("test login get");
         user.setPassword("test password");
-        user = (CarUser) dao.save(user);
-        assertThat(((CarUser) dao.get(new CarUser(user.getId()))).getLogin(), is("test login get"));
+        user = daoUser.save(user);
+        assertThat(daoUser.findById(user.getId()).orElseThrow().getLogin(), is("test login get"));
     }
 
     @Test
@@ -67,11 +65,11 @@ public class IDaoCrudTest {
         CarUser user = new CarUser();
         user.setLogin("test login in item");
         user.setPassword("test password");
-        user = (CarUser) dao.save(user);
+        user = daoUser.save(user);
         Item item = new Item();
         item.setUser(user);
-        item = (Item) dao.save(item);
-        assertThat(((Item) dao.get(new Item(item.getId()))).getUser().getLogin(), is("test login in item"));
+        item = dao.save(item);
+        assertThat(dao.findById(item.getId()).orElseThrow().getUser().getLogin(), is("test login in item"));
     }
 
     @Test
@@ -79,42 +77,41 @@ public class IDaoCrudTest {
         Item item = new Item();
         item.setTitle("test item in list");
         dao.save(item);
-        assertTrue(dao.getList("Item").contains(item));
+        assertTrue(dao.findAll().contains(item));
     }
 
     @Test
     public void whenGetListOnTodayItContainsOnlyForToday() {
         Item itemToday = new Item();
         itemToday.setTitle("test item today");
-        itemToday.setCreated(Calendar.getInstance());
+        itemToday.setCreated(LocalDateTime.now());
         dao.save(itemToday);
         Item itemYesterday = new Item();
         itemYesterday.setTitle("test item today");
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_MONTH, -1);
-        itemYesterday.setCreated(calendar);
+        itemYesterday.setCreated(LocalDateTime.now().minusDays(1));
         dao.save(itemYesterday);
-        assertTrue(dao.getItemsForDate(LocalDate.now()).contains(itemToday));
-        assertFalse(dao.getItemsForDate(LocalDate.now()).contains(itemYesterday));
+        assertTrue(dao.findByCreatedGreaterThanEqualAndCreatedLessThanOrderByIdDesc(LocalDate.now())
+                .contains(itemToday));
+        assertFalse(dao.findByCreatedGreaterThanEqualAndCreatedLessThanOrderByIdDesc(LocalDate.now())
+                .contains(itemYesterday));
     }
 
     @Test
     public void whenGetListForBrandItContainsBrand() {
         Brand brandAudi = new Brand();
         brandAudi.setTitle("audi");
-        brandAudi = (Brand) dao.save(brandAudi);
+        brandAudi = daoBrand.save(brandAudi);
         Item itemAudi = new Item();
         itemAudi.setBrand(brandAudi);
         dao.save(itemAudi);
         Brand brandBMW = new Brand();
         brandBMW.setTitle("BMW");
-        brandBMW = (Brand) dao.save(brandBMW);
+        brandBMW = daoBrand.save(brandBMW);
         Item itemBMW = new Item();
         itemBMW.setBrand(brandBMW);
         dao.save(itemBMW);
-        List<IEntity> list = dao.getItemsForBrand(brandAudi.getId());
-        assertTrue(dao.getItemsForBrand(brandAudi.getId()).contains(itemAudi));
-        assertFalse(dao.getItemsForBrand(brandAudi.getId()).contains(itemBMW));
+        assertTrue(dao.findByBrandIdOrderByIdDesc(brandAudi.getId()).contains(itemAudi));
+        assertFalse(dao.findByBrandIdOrderByIdDesc(brandAudi.getId()).contains(itemBMW));
     }
 
     @Test
@@ -124,8 +121,8 @@ public class IDaoCrudTest {
         dao.save(itemImg);
         Item itemWOImg = new Item();
         dao.save(itemWOImg);
-        assertTrue(dao.getItemsWithImg().contains(itemImg));
-        assertFalse(dao.getItemsWithImg().contains(itemWOImg));
+        assertTrue(dao.findByPictureNotNullOrderByIdDesc().contains(itemImg));
+        assertFalse(dao.findByPictureNotNullOrderByIdDesc().contains(itemWOImg));
     }
 
     @Test
@@ -134,7 +131,7 @@ public class IDaoCrudTest {
         user.setLogin("test auth");
         user.setPassword("test password");
         daoUser.save(user);
-        assertThat(daoUser.authUser("test auth", "test password"), is(user));
+        assertThat(daoUser.findByLoginAndPassword("test auth", "test password"), is(user));
     }
 
     @Test
@@ -143,6 +140,6 @@ public class IDaoCrudTest {
         user.setLogin("test auth false");
         user.setPassword("test password");
         daoUser.save(user);
-        assertNull(daoUser.authUser("test auth false", "wrong password"));
+        assertNull(daoUser.findByLoginAndPassword("test auth false", "wrong password"));
     }
 }

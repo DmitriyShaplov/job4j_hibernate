@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import ru.shaplov.exceptions.BadRequestException;
 import ru.shaplov.exceptions.UnauthorizedException;
-import ru.shaplov.logic.ILogicDB;
+import ru.shaplov.logic.ILogicItem;
 import ru.shaplov.models.*;
 
 import javax.servlet.ServletContext;
@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -39,13 +40,13 @@ public class ItemsController {
 
     private final Logger logger = LogManager.getLogger(ItemsController.class);
 
-    private final ILogicDB logic;
+    private final ILogicItem logic;
 
     private final Map<String, BiConsumer<String, Item>> paramMap = new HashMap<>();
-    private final Map<String, Function<Map<String, String>, List<IEntity>>> listMap = new HashMap<>();
+    private final Map<String, Function<Map<String, String>, List<Item>>> listMap = new HashMap<>();
 
     @Autowired
-    public ItemsController(ILogicDB logic) {
+    public ItemsController(ILogicItem logic) {
         this.logic = logic;
         paramMap.put("name", (v, item) -> item.setTitle(v));
         paramMap.put("brand", (v, item) -> item.setBrand(new Brand(Integer.parseInt(v))));
@@ -54,7 +55,7 @@ public class ItemsController {
         paramMap.put("engine-type-options", (v, item) -> item.setEngine(new EngineType(Integer.parseInt(v))));
         paramMap.put("drive-type-options", (v, item) -> item.setDrive(new DriveType(Integer.parseInt(v))));
         paramMap.put("transmission-type-options", (v, item) -> item.setTrans(new TransType(Integer.parseInt(v))));
-        listMap.put("ALL", params -> logic.getList("Item"));
+        listMap.put("ALL", params -> logic.getItems());
         listMap.put("TODAY", params -> logic.getItemsForDate(LocalDate.now()));
         listMap.put("WITH_IMG", params -> logic.getItemsWithImg());
         listMap.put("BRAND", params -> {
@@ -67,13 +68,12 @@ public class ItemsController {
     @ResponseBody
     public String itemsList(@RequestParam Map<String, String> params) {
         try {
-            List<IEntity> itemList = listMap.get(params.get("filter")).apply(params);
+            List<Item> itemList = listMap.get(params.get("filter")).apply(params);
             JsonFactory factory = new JsonFactory();
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             JsonGenerator generator = factory.createGenerator(outputStream);
             generator.writeStartArray();
-            for (IEntity entity : itemList) {
-                Item item = (Item) entity;
+            for (Item item : itemList) {
                 generator.writeStartObject();
                 generator.writeNumberField("itemId", item.getId());
                 generator.writeStringField("title", item.getTitle());
@@ -107,7 +107,7 @@ public class ItemsController {
     public String deleteItem(HttpSession session, @RequestParam("itemId") String itemIdStr) {
         try {
             int itemId = Integer.parseInt(itemIdStr);
-            CarUser user = ((Item) logic.get(new Item(itemId))).getUser();
+            CarUser user = logic.get(new Item(itemId)).getUser();
             int userId = user.getId();
             Integer currentUserId = (Integer) (session.getAttribute("userId"));
             if (currentUserId != userId) {
@@ -140,7 +140,7 @@ public class ItemsController {
             CarUser user = new CarUser();
             user.setId(userId);
             item.setUser(user);
-            item.setCreated(Calendar.getInstance());
+            item.setCreated(LocalDateTime.now());
             item.setSold(false);
         }
         try {
@@ -178,7 +178,7 @@ public class ItemsController {
             int itemId = Integer.parseInt(itemIdStr);
             boolean sold = Boolean.parseBoolean(soldStr);
             Item item = new Item(itemId);
-            Item storedItem = (Item) logic.get(item);
+            Item storedItem = logic.get(item);
             int userId = storedItem.getUser().getId();
             Integer curUserId = (Integer) session.getAttribute("userId");
             if (curUserId == null || curUserId != userId) {
