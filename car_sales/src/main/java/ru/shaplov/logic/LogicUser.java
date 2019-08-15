@@ -30,4 +30,9 @@ public class LogicUser implements ILogicUser {
     public CarUser authUser(String login, String password) {
         return userRepository.findByLoginAndPassword(login, password);
     }
+
+    @Override
+    public CarUser findByLogin(String login) {
+        return userRepository.findByLogin(login);
+    }
 }

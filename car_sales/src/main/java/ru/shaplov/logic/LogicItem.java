@@ -8,7 +8,6 @@ import ru.shaplov.persistence.ItemRepository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author shaplov

@@ -16,4 +16,6 @@ public interface UserRepository extends JpaRepository<CarUser, Integer> {
      * @return User or null.
      */
     CarUser findByLoginAndPassword(String login, String password);
+
+    CarUser findByLogin(String username);
 }

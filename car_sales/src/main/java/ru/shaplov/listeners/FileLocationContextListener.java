@@ -17,7 +17,7 @@ import java.nio.file.Paths;
  */
 public class FileLocationContextListener implements ServletContextListener {
 
-    private Logger logger = LogManager.getLogger(FileLocationContextListener.class);
+    private static final Logger LOG = LogManager.getLogger(FileLocationContextListener.class);
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -28,9 +28,9 @@ public class FileLocationContextListener implements ServletContextListener {
         if (!Files.exists(path)) {
             try {
                 Files.createDirectories(path);
-                logger.info("Images directory created.");
+                LOG.info("Images directory created.");
             } catch (IOException e) {
-                logger.error(e.getMessage(), e);
+                LOG.error(e.getMessage(), e);
             }
         }
         ctx.setAttribute("IMAGES_PATH", path);

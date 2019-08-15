@@ -271,7 +271,7 @@
 
     $(
        $("#filteredBrand").change(function () {
-           var filterStatus = $("#filter").children(":selected").val()
+           var filterStatus = $("#filter").children(":selected").val();
            var brandId = $(this).children(":selected").val();
            if (filterStatus !== 'BRAND') {
                return;

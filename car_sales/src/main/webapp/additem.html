@@ -356,7 +356,7 @@
             if (values.length === 1) {
                 result += "<label class=\"btn btn-outline-secondary b-hover active\"><input type=\"radio\" checked style=\"display: none\" name=\"transmission-type-options\""
                     + " value='" + values[0].id + "'>" +
-                    values[0].title + "</label>"
+                    values[0].title + "</label>";
                 $("#transmission-type").html(result);
             } else {
                 values.forEach(function (value) {

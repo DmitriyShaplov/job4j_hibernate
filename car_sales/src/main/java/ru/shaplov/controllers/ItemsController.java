@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +18,7 @@ import ru.shaplov.exceptions.BadRequestException;
 import ru.shaplov.exceptions.UnauthorizedException;
 import ru.shaplov.logic.ILogicItem;
 import ru.shaplov.models.*;
+import ru.shaplov.principal.CarUserPrincipal;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.*;
@@ -38,7 +41,7 @@ import java.util.function.Function;
 @Controller
 public class ItemsController {
 
-    private final Logger logger = LogManager.getLogger(ItemsController.class);
+    private static final Logger LOG = LogManager.getLogger(ItemsController.class);
 
     private final ILogicItem logic;
 
@@ -97,46 +100,49 @@ public class ItemsController {
             outputStream.close();
             return outputStream.toString(StandardCharsets.UTF_8);
         } catch (Exception e) {
-            logger.error("Error on getting list of items.");
+            LOG.error("Error on getting list of items.");
             throw new BadRequestException("Error on delete item");
         }
     }
 
     @PostMapping(value = "/items", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String deleteItem(HttpSession session, @RequestParam("itemId") String itemIdStr) {
+    public String deleteItem(@RequestParam("itemId") String itemIdStr, Authentication authentication) {
         try {
             int itemId = Integer.parseInt(itemIdStr);
             CarUser user = logic.get(new Item(itemId)).getUser();
             int userId = user.getId();
-            Integer currentUserId = (Integer) (session.getAttribute("userId"));
+            if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+                throw new UnauthorizedException("You need to login first");
+            }
+            int currentUserId = ((CarUserPrincipal) authentication.getPrincipal()).getId();
             if (currentUserId != userId) {
-                logger.error("User id not equals to item owner");
+                LOG.error("User id not equals to item owner");
                 throw new IllegalStateException("User id not equals to item owner");
             }
             Item item = new Item(itemId);
             logic.delete(item);
-            logger.info("Item id " + item.getId() + " deleted");
+            LOG.info("Item id " + item.getId() + " deleted");
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode node = mapper.createObjectNode();
             node.put("success", true);
             return mapper.writeValueAsString(node);
         } catch (Exception e) {
-            logger.error("Error on delete item");
+            LOG.error("Error on delete item");
             throw new BadRequestException("Error on delete item");
         }
     }
 
     @PostMapping(value = "/add", consumes = "multipart/form-data;charset=UTF-8")
     public String addItem(HttpSession session, @RequestParam Map<String, String> allParameters,
-                          @RequestParam Part file) {
+                          @RequestParam Part file, Authentication authentication) {
         ServletContext context = session.getServletContext();
         Path path = (Path) context.getAttribute("IMAGES_PATH");
-        Integer userId = (Integer) session.getAttribute("userId");
         final Item item = new Item();
-        if (userId == null) {
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             throw new UnauthorizedException("You need to login first");
         } else {
+            int userId = ((CarUserPrincipal) authentication.getPrincipal()).getId();
             CarUser user = new CarUser();
             user.setId(userId);
             item.setUser(user);
@@ -149,7 +155,7 @@ public class ItemsController {
             }
             if (file.getSize() > 0) {
                 if (!file.getContentType().equals("image/jpeg")) {
-                    logger.error("Wrong content type, must be image/jpeg but was " + file.getContentType());
+                    LOG.error("Wrong content type, must be image/jpeg but was " + file.getContentType());
                     throw new IllegalStateException("wrong image type");
                 }
                 String fileName = file.getSubmittedFileName();
@@ -165,14 +171,14 @@ public class ItemsController {
             logic.save(item);
             return "redirect:/index.html";
         } catch (Exception e) {
-            logger.error("Error parsing multipart/form-data");
+            LOG.error("Error parsing multipart/form-data");
             throw new BadRequestException("Error parsing multipart/form-data");
         }
     }
 
     @PostMapping(value = "/update", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String updateItem(HttpSession session, @RequestParam("itemId") String itemIdStr,
+    public String updateItem(Authentication authentication, @RequestParam("itemId") String itemIdStr,
                              @RequestParam("sold") String soldStr) {
         try {
             int itemId = Integer.parseInt(itemIdStr);
@@ -180,26 +186,30 @@ public class ItemsController {
             Item item = new Item(itemId);
             Item storedItem = logic.get(item);
             int userId = storedItem.getUser().getId();
-            Integer curUserId = (Integer) session.getAttribute("userId");
-            if (curUserId == null || curUserId != userId) {
-                logger.error("Item doesn't belong to user on update");
+            if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+                LOG.error("Unauthorized user");
+                throw new IllegalStateException("You must authorize first.");
+            }
+            int curUserId = ((CarUserPrincipal) authentication.getPrincipal()).getId();
+            if (curUserId != userId) {
+                LOG.error("Item doesn't belong to user on update");
                 throw new IllegalStateException("Unauthorized access");
             }
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode node = mapper.createObjectNode();
             if (sold == storedItem.isSold()) {
                 node.put("success", false);
-                logger.info("Item doesn't changed");
+                LOG.info("Item doesn't changed");
             } else {
                 storedItem.setSold(sold);
                 logic.update(storedItem);
                 node.put("success", true);
                 node.put("sold", storedItem.isSold());
-                logger.info("Item status sold changed on " + sold);
+                LOG.info("Item status sold changed on " + sold);
             }
             return mapper.writeValueAsString(node);
         } catch (Exception e) {
-            logger.error("Error on updating item");
+            LOG.error("Error on updating item");
             throw new BadRequestException(String.format("Error on updating item%n%s", e.getMessage()));
         }
     }

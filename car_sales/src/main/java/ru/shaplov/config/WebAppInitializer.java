@@ -2,7 +2,6 @@ package ru.shaplov.config;
 
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
-import ru.shaplov.filters.AuthFilter;
 import ru.shaplov.listeners.FileLocationContextListener;
 
 import javax.servlet.MultipartConfigElement;
@@ -20,9 +19,7 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
     public void onStartup(ServletContext servletContext) throws ServletException {
         servletContext.setInitParameter("images.dir", "images");
         servletContext.addListener(FileLocationContextListener.class);
-        servletContext.addFilter("AuthFilter", AuthFilter.class)
-                .addMappingForUrlPatterns(null, true, "/*");
-        servletContext.addFilter("CharacterEncidoingFilter", new CharacterEncodingFilter("UTF-8", true))
+        servletContext.addFilter("CharacterEncodingFilter", new CharacterEncodingFilter("UTF-8", true))
                 .addMappingForUrlPatterns(null, true, "/*");
         super.onStartup(servletContext);
     }
@@ -46,6 +43,4 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
     protected void customizeRegistration(ServletRegistration.Dynamic registration) {
         registration.setMultipartConfig(new MultipartConfigElement(""));
     }
-
-
 }
