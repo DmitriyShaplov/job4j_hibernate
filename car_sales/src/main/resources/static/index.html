@@ -310,7 +310,7 @@
 
     $(
         $("#additem").click(function () {
-            window.location.href = "./additem.html";
+            window.location.href = "additem.html";
         })
     );
 
@@ -542,7 +542,7 @@
                 newElements.find(".item_title").text(item.title);
                 newElements.find(".tel").text(item.user.tel);
                 if (item.picture != null) {
-                    newElements.find("img").prop("src", item.picture);
+                    newElements.find("img").prop("src", "images/" + item.picture);
                 } else {
                     newElements.find("img").prop("src", "images/system/No_image.png");
                 }

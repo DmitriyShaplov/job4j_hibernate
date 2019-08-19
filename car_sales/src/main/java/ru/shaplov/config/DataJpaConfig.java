@@ -2,7 +2,6 @@ package ru.shaplov.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -20,7 +19,6 @@ import javax.sql.DataSource;
  * @author shaplov
  * @since 05.08.2019
  */
-@Configuration
 @EnableJpaRepositories("ru.shaplov.persistence")
 @EnableTransactionManagement
 @PropertySource("classpath:app.properties")

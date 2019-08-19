@@ -17,7 +17,7 @@ public class LogicUser implements ILogicUser {
     private final UserRepository userRepository;
 
     @Autowired
-    private LogicUser(UserRepository userRepository) {
+    public LogicUser(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

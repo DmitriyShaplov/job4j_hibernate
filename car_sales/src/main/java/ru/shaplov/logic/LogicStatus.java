@@ -18,7 +18,7 @@ public class LogicStatus implements ILogicStatus {
     private final ItemRepository itemRepository;
 
     @Autowired
-    private LogicStatus(ItemRepository dao) {
+    public LogicStatus(ItemRepository dao) {
         this.itemRepository = dao;
     }
 

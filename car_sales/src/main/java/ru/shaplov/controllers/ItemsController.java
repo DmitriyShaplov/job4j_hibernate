@@ -7,23 +7,26 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import ru.shaplov.exceptions.BadRequestException;
 import ru.shaplov.exceptions.UnauthorizedException;
 import ru.shaplov.logic.ILogicItem;
 import ru.shaplov.models.*;
 import ru.shaplov.principal.CarUserPrincipal;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.*;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -47,6 +50,9 @@ public class ItemsController {
 
     private final Map<String, BiConsumer<String, Item>> paramMap = new HashMap<>();
     private final Map<String, Function<Map<String, String>, List<Item>>> listMap = new HashMap<>();
+
+    @Value("${custom.images.dir}")
+    private String imagesDir;
 
     @Autowired
     public ItemsController(ILogicItem logic) {
@@ -134,10 +140,8 @@ public class ItemsController {
     }
 
     @PostMapping(value = "/add", consumes = "multipart/form-data;charset=UTF-8")
-    public String addItem(HttpSession session, @RequestParam Map<String, String> allParameters,
+    public String addItem(@RequestParam Map<String, String> allParameters,
                           @RequestParam Part file, Authentication authentication) {
-        ServletContext context = session.getServletContext();
-        Path path = (Path) context.getAttribute("IMAGES_PATH");
         final Item item = new Item();
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             throw new UnauthorizedException("You need to login first");
@@ -150,29 +154,52 @@ public class ItemsController {
             item.setSold(false);
         }
         try {
+            Path path = Paths.get(imagesDir);
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
             for (Map.Entry<String, String> entry : allParameters.entrySet()) {
                 paramMap.get(entry.getKey()).accept(entry.getValue(), item);
             }
             if (file.getSize() > 0) {
-                if (!file.getContentType().equals("image/jpeg")) {
-                    LOG.error("Wrong content type, must be image/jpeg but was " + file.getContentType());
+                if (!file.getContentType().contains("image")) {
+                    LOG.error("Wrong content type, must be image but was " + file.getContentType());
                     throw new IllegalStateException("wrong image type");
                 }
                 String fileName = file.getSubmittedFileName();
                 String generatedName = fileName.substring(0, fileName.lastIndexOf("."))
                         + new Random().nextInt()
                         + fileName.substring(fileName.lastIndexOf("."));
-                Path generatedPath = Paths.get(path.toString(), generatedName);
+                Path generatedPath = path.toAbsolutePath().resolve(generatedName);
                 file.write(generatedPath.toString());
-                String realPath = context.getRealPath("");
-                String picture = Paths.get(realPath).relativize(generatedPath).toString();
-                item.setPicture(picture);
+                item.setPicture(generatedName);
             }
             logic.save(item);
             return "redirect:/index.html";
         } catch (Exception e) {
             LOG.error("Error parsing multipart/form-data");
             throw new BadRequestException("Error parsing multipart/form-data");
+        }
+    }
+
+    @GetMapping("/images/{image}")
+    @ResponseBody
+    public ResponseEntity<Resource> getPicture(@PathVariable String image, HttpServletRequest request,
+                                               HttpServletResponse response) {
+        try {
+            Resource resource = new UrlResource(Paths.get(imagesDir).toAbsolutePath().resolve(image).toUri());
+            if (!resource.exists()) {
+                throw new BadRequestException("Image not found " + image);
+            }
+            String contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(resource);
+        } catch (Exception e) {
+            throw new BadRequestException("Image not found " + image);
         }
     }
 

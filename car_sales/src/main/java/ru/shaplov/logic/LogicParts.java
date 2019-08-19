@@ -21,7 +21,7 @@ public class LogicParts implements ILogicParts {
     private final BrandRepository brandRepository;
 
     @Autowired
-    private LogicParts(CarPartsRepository daoParts, BrandRepository brandRepository) {
+    public LogicParts(CarPartsRepository daoParts, BrandRepository brandRepository) {
         this.partsRepository = daoParts;
         this.brandRepository = brandRepository;
     }

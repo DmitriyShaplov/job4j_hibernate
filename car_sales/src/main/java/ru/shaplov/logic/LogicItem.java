@@ -20,7 +20,7 @@ public class LogicItem implements ILogicItem {
     private final ItemRepository itemRepository;
 
     @Autowired
-    private LogicItem(ItemRepository itemRepository) {
+    public LogicItem(ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
     }
 
