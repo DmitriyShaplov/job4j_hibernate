@@ -49,8 +49,7 @@ public class AuthControllerTest {
     public void whenBadCredentials() throws Exception {
         mvc.perform(post("/login").param("username", "testTESTtest1"))
                 .andDo(print())
-                .andExpect(unauthenticated())
-                .andExpect(content().string("{\"error\":\"Bad credentials\"}"));
+                .andExpect(unauthenticated());
     }
 
     @Test

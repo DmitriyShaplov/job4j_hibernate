@@ -15,6 +15,9 @@
     <style>
         body {
             background-color: #e1e1e8;
+            z-index: -1;
+            background-image: url("images/system/nemeck.jpg");
+            background-repeat: repeat-x;
         }
 
         .item {
@@ -124,6 +127,7 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             background-color: white;
+            min-width: 400px;
         }
     </style>
 </head>
@@ -138,7 +142,7 @@
         <button type="button" data-toggle="modal" data-target="#login-modal" class="btn btn-primary"
                 style="margin-right: 10px; display: none"
                 id="login-btn">Войти</button>
-        <div id="greeting-div" style="flex-grow: 1; display: none; line-height: 0.7em;">
+        <div id="greeting-div" style="flex-grow: 1; display: none; line-height: 0.7em; color: white">
             <h6 id="greeting" style="text-align: right;"></h6>
             <div style="text-align: right"><a id="exit" href="#">Выйти</a></div>
         </div>
@@ -321,7 +325,9 @@
     function resetElements(data) {
         if (data.username) {
             userId = data.userId;
-            $("#additem").show();
+            if (userId !== 0) {
+                $("#additem").show();
+            }
             $("#registry-btn").hide();
             $("#login-btn").hide();
             $("#greeting-div").show();
@@ -433,11 +439,7 @@
                 },
                 dataType: "json"
             }).done(function (data) {
-                if (data.error) {
-                    $("#username").removeClass("is-valid").addClass("is-invalid");
-                    $("#password").removeClass("is-valid").addClass("is-invalid");
-                    $("#wrong-login").show();
-                } else if (data.username) {
+                if (data.username) {
                     $("#username").removeClass("is-invalid").removeClass("is-valid").val("");
                     $("#password").removeClass("is-invalid").removeClass("is-valid").val("");
                     $("#wrong-login").hide();
@@ -445,6 +447,10 @@
                     updateFooter();
                     $("#login-modal").modal("hide");
                 }
+            }).fail(function () {
+                $("#username").removeClass("is-valid").addClass("is-invalid");
+                $("#password").removeClass("is-valid").addClass("is-invalid");
+                $("#wrong-login").show();
             })
         }
     }
@@ -560,7 +566,7 @@
                 } else {
                     newElements.find(".sold").text("");
                 }
-                if (item.user.id === userId) {
+                if (userId === 0 || item.user.id === userId) {
                     newElements.find(".footer").show();
                 } else {
                     newElements.find(".footer").hide();
@@ -573,7 +579,7 @@
         var items = $(".all-items").children();
         items.each(function () {
             let id = +$(this).find(".user_id").val();
-            if (id === userId) {
+            if (userId === 0 || id === userId) {
                 $(this).find(".footer").show();
             } else {
                 $(this).find(".footer").hide();

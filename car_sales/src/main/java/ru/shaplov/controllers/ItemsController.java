@@ -77,7 +77,7 @@ public class ItemsController {
             return mapper.writeValueAsString(itemList);
         } catch (Exception e) {
             LOG.error("Error on getting list of items.");
-            throw new BadRequestException("Error on delete item");
+            throw new BadRequestException("Error on getting items");
         }
     }
 
@@ -92,7 +92,9 @@ public class ItemsController {
                 throw new UnauthorizedException("You need to login first");
             }
             int currentUserId = ((CarUserPrincipal) authentication.getPrincipal()).getId();
-            if (currentUserId != userId) {
+            if ((!authentication.getAuthorities().isEmpty()
+                    && !"ROLE_ADMIN".equals(authentication.getAuthorities().iterator().next().getAuthority()))
+                    && currentUserId != userId) {
                 LOG.error("User id not equals to item owner");
                 throw new IllegalStateException("User id not equals to item owner");
             }
@@ -169,9 +171,11 @@ public class ItemsController {
                 throw new IllegalStateException("You must authorize first.");
             }
             int curUserId = ((CarUserPrincipal) authentication.getPrincipal()).getId();
-            if (curUserId != userId) {
-                LOG.error("Item doesn't belong to user on update");
-                throw new IllegalStateException("Unauthorized access");
+            if ((!authentication.getAuthorities().isEmpty()
+                    && !"ROLE_ADMIN".equals(authentication.getAuthorities().iterator().next().getAuthority()))
+                    && curUserId != userId) {
+                LOG.error("User id not equals to item owner");
+                throw new IllegalStateException("User id not equals to item owner");
             }
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode node = mapper.createObjectNode();

@@ -109,11 +109,19 @@
                     </div>
                 </div>
             </div>
-            <div class="custom-file" style="margin-bottom: 20px">
-                <input type="file" class="custom-file-input pointer" id="file" name="file" accept="image/*">
-                <label class="custom-file-label pointer" for="file">Выберите картинку</label>
-                <div class="invalid-feedback">
-                    Please choose car image.
+            <div class="row">
+                <div class="col-sm-4">
+                    <img id="img_current" alt="cur" src="images/system/No_image.png" style="width: 100%; max-height: 300px"/>
+                </div>
+                <div class="col-sm-8">
+                    <div class="custom-file" style="margin-bottom: 20px">
+                        <input type="file" class="custom-file-input pointer" id="file" name="file" accept="image/*"
+                               onchange="showLoadedImage(this)">
+                        <label class="custom-file-label pointer" for="file">Выберите картинку</label>
+                        <div class="invalid-feedback">
+                            Please choose car image.
+                        </div>
+                    </div>
                 </div>
             </div>
             <button type="submit" class="btn btn-outline-success" style="float: right" onclick="return validate()">Отправить объявление</button>
@@ -122,6 +130,16 @@
 </div>
 </body>
 <script>
+    function showLoadedImage(input) {
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                $('#img_current').attr('src', e.target.result);
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
     $(function () {
         bsCustomFileInput.init()
     });
