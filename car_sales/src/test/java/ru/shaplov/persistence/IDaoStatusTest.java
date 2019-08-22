@@ -2,9 +2,11 @@ package ru.shaplov.persistence;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import ru.shaplov.config.DataJpaConfig;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 import ru.shaplov.models.Brand;
 import ru.shaplov.models.Item;
 
@@ -14,11 +16,16 @@ import java.time.LocalDateTime;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
+@RunWith(SpringRunner.class)
+@DataJpaTest
+@TestPropertySource("/application-test.properties")
 public class IDaoStatusTest {
 
-    private final ApplicationContext ctx = new AnnotationConfigApplicationContext(DataJpaConfig.class);
-    private final ItemRepository dao = ctx.getBean(ItemRepository.class);
-    private final BrandRepository daoBrand = ctx.getBean(BrandRepository.class);
+    @Autowired
+    private ItemRepository dao;
+
+    @Autowired
+    private BrandRepository daoBrand;
 
     @Before
     public void clearItems() {

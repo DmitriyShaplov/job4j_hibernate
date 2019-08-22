@@ -166,15 +166,8 @@ public class Item implements ITitledEntity {
         }
 
         Item item = (Item) o;
-        LocalDateTime createdTrunc = null;
-        LocalDateTime createdTruncObj = null;
-        if (created != null && item.created != null) {
-            createdTrunc = created.truncatedTo(ChronoUnit.MILLIS);
-            createdTruncObj = item.created.truncatedTo(ChronoUnit.MILLIS);
-        }
         return id == item.id && sold == item.sold
                 && Objects.equals(title, item.title)
-                && Objects.equals(createdTrunc, createdTruncObj)
                 && Objects.equals(user, item.user)
                 && Objects.equals(brand, item.brand)
                 && Objects.equals(model, item.model)
@@ -186,6 +179,6 @@ public class Item implements ITitledEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, sold, created, user, brand, model, body, engine, drive, trans);
+        return Objects.hash(id, title, sold, user, brand, model, body, engine, drive, trans);
     }
 }

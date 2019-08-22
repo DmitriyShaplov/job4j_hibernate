@@ -546,21 +546,21 @@
                 } else {
                     newElements.find("img").prop("src", "images/system/No_image.png");
                 }
-                newElements.find(".brand").text(item.brand);
-                newElements.find(".model").text(item.model);
-                newElements.find(".body").text(item.body);
-                newElements.find(".engine").text(item.engine);
-                newElements.find(".drive").text(item.drive);
-                newElements.find(".trans").text(item.trans);
-                newElements.find(".item_id").val(item.itemId);
-                newElements.find(".user_id").val(item.user.userId);
+                newElements.find(".brand").text(item.brand.title);
+                newElements.find(".model").text(item.model.title);
+                newElements.find(".body").text(item.body.title);
+                newElements.find(".engine").text(item.engine.title);
+                newElements.find(".drive").text(item.drive.title);
+                newElements.find(".trans").text(item.trans.title);
+                newElements.find(".item_id").val(item.id);
+                newElements.find(".user_id").val(item.user.id);
                 newElements.find(".danger").prop("checked", item.sold);
                 if (item.sold === true) {
                     newElements.find(".sold").text("SOLD");
                 } else {
                     newElements.find(".sold").text("");
                 }
-                if (item.user.userId === userId) {
+                if (item.user.id === userId) {
                     newElements.find(".footer").show();
                 } else {
                     newElements.find(".footer").hide();

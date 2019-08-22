@@ -1,5 +1,7 @@
 package ru.shaplov.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -9,6 +11,7 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "model")
+@JsonIgnoreProperties(value = { "brand" })
 public class Model implements ITitledEntity {
 
     @Id

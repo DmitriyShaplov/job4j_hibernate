@@ -2,25 +2,37 @@ package ru.shaplov.persistence;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import ru.shaplov.config.DataJpaConfig;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 import ru.shaplov.models.*;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+@RunWith(SpringRunner.class)
+@DataJpaTest
+@TestPropertySource("/application-test.properties")
 public class IDaoPartsTest {
 
-    private final ApplicationContext ctx = new AnnotationConfigApplicationContext(DataJpaConfig.class);
-    private final CarPartsRepository daoParts = ctx.getBean(CarPartsRepository.class);
-    private final BrandRepository daoBrand = ctx.getBean(BrandRepository.class);
-    private final ModelRepository daoModel = ctx.getBean(ModelRepository.class);
-    private final BodyTypeRepository daoBody = ctx.getBean(BodyTypeRepository.class);
-    private final EngineTypeRepository daoEngine = ctx.getBean(EngineTypeRepository.class);
-    private final DriveTypeRepository daoDrive = ctx.getBean(DriveTypeRepository.class);
-    private final TransTypeRepository daoTrans = ctx.getBean(TransTypeRepository.class);
-    private final UnifyingRepository daoUni = ctx.getBean(UnifyingRepository.class);
+    @Autowired
+    private CarPartsRepository daoParts;
+    @Autowired
+    private BrandRepository daoBrand;
+    @Autowired
+    private ModelRepository daoModel;
+    @Autowired
+    private BodyTypeRepository daoBody;
+    @Autowired
+    private EngineTypeRepository daoEngine;
+    @Autowired
+    private DriveTypeRepository daoDrive;
+    @Autowired
+    private TransTypeRepository daoTrans;
+    @Autowired
+    private UnifyingRepository daoUni;
 
     private int modelId;
     private int bodyId;
