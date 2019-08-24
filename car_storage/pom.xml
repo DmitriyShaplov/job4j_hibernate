@@ -19,7 +19,7 @@
                 <version>3.7.0</version>
                 <configuration>
                     <changeLogFile>${basedir}/db/master.sql</changeLogFile>
-                    <url>${env.JDBC_DATABASE_URL}</url>
+                    <url>${db.url}</url>
                     <username>${db.username}</username>
                     <password>${db.password}</password>
                     <driver>${db.driver}</driver>
