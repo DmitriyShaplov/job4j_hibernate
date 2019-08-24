@@ -504,6 +504,14 @@ insert into unifying(model_id, body_type_id, engine_type_id, drive_type_id, tran
  (select id from drive_type where title = 'Задний'),
  (select id from trans_type where title = 'Механика'));
 
+--changeset shaplov:6
 
+delete from items;
+
+create table picture_lob (
+  id serial primary key,
+  img bytea,
+  mime_type varchar(100)
+)
 
 

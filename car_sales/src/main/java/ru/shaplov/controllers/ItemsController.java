@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -18,13 +18,8 @@ import ru.shaplov.exceptions.UnauthorizedException;
 import ru.shaplov.logic.ILogicItem;
 import ru.shaplov.models.*;
 import ru.shaplov.principal.CarUserPrincipal;
-import ru.shaplov.util.ImageStorageService;
-import ru.shaplov.util.ImageStorageServiceImpl;
 
 import javax.servlet.http.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -43,14 +38,12 @@ public class ItemsController {
     private static final Logger LOG = LogManager.getLogger(ItemsController.class);
 
     private final ILogicItem logic;
-    private final ImageStorageService imageStorageService;
 
     private final Map<String, BiConsumer<String, Item>> paramMap = new HashMap<>();
     private final Map<String, Function<Map<String, String>, List<Item>>> listMap = new HashMap<>();
 
     @Autowired
-    public ItemsController(ILogicItem logic, ImageStorageService imageStorageService) {
-        this.imageStorageService = imageStorageService;
+    public ItemsController(ILogicItem logic) {
         this.logic = logic;
         paramMap.put("name", (v, item) -> item.setTitle(v));
         paramMap.put("brand", (v, item) -> item.setBrand(new Brand(Integer.parseInt(v))));
@@ -129,9 +122,7 @@ public class ItemsController {
             for (Map.Entry<String, String> entry : allParameters.entrySet()) {
                 paramMap.get(entry.getKey()).accept(entry.getValue(), item);
             }
-            Optional<String> fileName = imageStorageService.storeImage(file);
-            fileName.ifPresent(item::setPicture);
-            logic.save(item);
+            logic.save(item, file);
             return "redirect:/index.html";
         } catch (Exception e) {
             LOG.error("Error parsing multipart/form-data");
@@ -141,10 +132,11 @@ public class ItemsController {
 
     @GetMapping("/images/{image}")
     @ResponseBody
-    public ResponseEntity<Resource> getPicture(@PathVariable String image, HttpServletRequest request) {
+    public ResponseEntity<Resource> getPicture(@PathVariable String image) {
         try {
-            Resource resource = imageStorageService.loadImageAsResource(image);
-            String contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+            PictureLob img = logic.getImg(new PictureLob(Integer.parseInt(image)));
+            Resource resource = new ByteArrayResource(img.getImg());
+            String contentType = img.getMimeType();
             if (contentType == null) {
                 contentType = "application/octet-stream";
             }

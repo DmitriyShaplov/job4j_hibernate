@@ -17,8 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.shaplov.logic.ILogicItem;
 import ru.shaplov.models.*;
 import ru.shaplov.principal.CarUserPrincipal;
-import ru.shaplov.util.ImageStorageService;
 
+import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -41,9 +41,6 @@ public class ItemsControllerTest {
 
     @MockBean
     private ILogicItem service;
-
-    @MockBean
-    private ImageStorageService imageStorageService;
 
     @Test
     public void whenGetItemsListThenJsonList() throws Exception {
@@ -91,10 +88,11 @@ public class ItemsControllerTest {
         Item item = new Item();
         item.setTitle("test-name");
         CarUser user = new CarUser(10);
+        MockPart file = new MockPart("file", "".getBytes());
         item.setUser(user);
         mvc.perform(
                 multipart("/add")
-                        .part(new MockPart("file", "".getBytes()))
+                        .part(file)
                         .with(user(new CarUserPrincipal(10, "user", "password", new ArrayList<>())))
                         .param("name", "test-name")
                         .accept(MediaType.TEXT_HTML)
@@ -106,7 +104,7 @@ public class ItemsControllerTest {
         );
         verify(
                 service, times(1)
-        ).save(item);
+        ).save(item, file);
     }
 
     @Test
@@ -137,13 +135,17 @@ public class ItemsControllerTest {
 
     @Test
     public void whenGetImageThenContentBytes() throws Exception {
+
         URL url = ItemsControllerTest.class.getClassLoader().getResource("static/images/system/No_image.png");
         Resource resource = new UrlResource(Objects.requireNonNull(url));
+        PictureLob img = new PictureLob(1);
+        img.setImg(Objects.requireNonNull(ItemsControllerTest.class.getClassLoader()
+                .getResourceAsStream("static/images/system/No_image.png")).readAllBytes());
         byte[] file = Files.readAllBytes(resource.getFile().toPath());
         given(
-                imageStorageService.loadImageAsResource("1")
+                service.getImg(new PictureLob(1))
         ).willReturn(
-                resource
+                img
         );
         mvc.perform(
                 get("/images/1")
