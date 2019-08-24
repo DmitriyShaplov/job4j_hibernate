@@ -23,6 +23,7 @@
                     <username>${db.username}</username>
                     <password>${db.password}</password>
                     <driver>${db.driver}</driver>
+                    <promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
                 </configuration>
                 <executions>
                     <execution>
