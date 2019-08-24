@@ -9,4 +9,5 @@ import ru.shaplov.models.CarUser;
 public interface ILogicUser {
     CarUser save(CarUser user);
     CarUser authUser(String login, String password);
+    CarUser findByLogin(String login);
 }

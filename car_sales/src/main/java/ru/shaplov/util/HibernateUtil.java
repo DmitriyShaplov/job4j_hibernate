@@ -15,7 +15,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
  */
 public class HibernateUtil {
 
-    private final Logger logger = LogManager.getLogger(HibernateUtil.class);
+    private static final Logger LOG = LogManager.getLogger(HibernateUtil.class);
 
     private static final HibernateUtil INSTANCE = new HibernateUtil();
 
@@ -28,10 +28,10 @@ public class HibernateUtil {
         try {
             sf = new MetadataSources(registry)
                     .buildMetadata().buildSessionFactory();
-            logger.info("Session factory initialized.");
+            LOG.info("Session factory initialized.");
         } catch (Exception e) {
             StandardServiceRegistryBuilder.destroy(registry);
-            logger.error("Session factory couldn't initialize.", e);
+            LOG.error("Session factory couldn't initialize.", e);
             throw e;
         }
     }

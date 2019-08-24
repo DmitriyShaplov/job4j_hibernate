@@ -1,33 +1,38 @@
 package ru.shaplov.logic;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.shaplov.models.CarUser;
-import ru.shaplov.persistence.DaoUser;
-import ru.shaplov.persistence.IDaoUser;
+import ru.shaplov.persistence.UserRepository;
 
 /**
  * @author shaplov
  * @since 30.07.2019
  */
+@Service
+@Transactional
 public class LogicUser implements ILogicUser {
 
-    private final IDaoUser daoUser = DaoUser.getInstance();
+    private final UserRepository userRepository;
 
-    private static final LogicUser INSTANCE = new LogicUser();
-
-    private LogicUser() {
-    }
-
-    public static LogicUser getInstance() {
-        return INSTANCE;
+    @Autowired
+    public LogicUser(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public CarUser save(CarUser user) {
-        return daoUser.save(user);
+        return userRepository.save(user);
     }
 
     @Override
     public CarUser authUser(String login, String password) {
-        return daoUser.authUser(login, password);
+        return userRepository.findByLoginAndPassword(login, password);
+    }
+
+    @Override
+    public CarUser findByLogin(String login) {
+        return userRepository.findByLogin(login);
     }
 }

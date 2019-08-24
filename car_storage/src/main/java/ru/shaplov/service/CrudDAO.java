@@ -6,6 +6,7 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import ru.shaplov.models.EngineANN;
 import ru.shaplov.models.IEntity;
 
 import java.util.function.Function;
@@ -74,5 +75,14 @@ public class CrudDAO {
             session.delete(entity);
             return null;
         });
+    }
+
+    public static void main(String[] args) {
+        CrudDAO dao = new CrudDAO();
+        EngineANN engineANN = new EngineANN();
+        engineANN.setName("engineeee");
+        engineANN = (EngineANN) dao.add(engineANN);
+        Object object = dao.get(engineANN);
+        System.out.println("test");
     }
 }

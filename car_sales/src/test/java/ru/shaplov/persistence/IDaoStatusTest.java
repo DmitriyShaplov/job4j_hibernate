@@ -2,23 +2,34 @@ package ru.shaplov.persistence;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 import ru.shaplov.models.Brand;
 import ru.shaplov.models.Item;
 
 import java.time.LocalDate;
-import java.util.Calendar;
+import java.time.LocalDateTime;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
+@RunWith(SpringRunner.class)
+@DataJpaTest
+@TestPropertySource("/application-test.properties")
 public class IDaoStatusTest {
 
-    private final IDaoCrud dao = CarDAO.getInstance();
-    private final IDaoStatus daoStatus = DaoStatus.getInstance();
+    @Autowired
+    private ItemRepository dao;
+
+    @Autowired
+    private BrandRepository daoBrand;
 
     @Before
     public void clearItems() {
-        dao.getList("Item").forEach(dao::delete);
+        dao.findAll().forEach(dao::delete);
     }
 
     @Test
@@ -27,35 +38,33 @@ public class IDaoStatusTest {
         Item item2 = new Item();
         dao.save(item1);
         dao.save(item2);
-        assertThat(daoStatus.getItemCount(), is(2));
-        assertThat(daoStatus.getLastItemId(), is(item2.getId()));
+        assertThat((int) dao.count(), is(2));
+        assertThat(dao.findFirstByOrderByIdDesc().getId(), is(item2.getId()));
     }
 
     @Test
     public void whenGetItemCountAndIdTodayThen1AndTodayId() {
         Item item1 = new Item();
-        item1.setCreated(Calendar.getInstance());
+        item1.setCreated(LocalDateTime.now());
         Item item2 = new Item();
-        Calendar yesterday = Calendar.getInstance();
-        yesterday.add(Calendar.DAY_OF_MONTH, -1);
-        item2.setCreated(yesterday);
+        item2.setCreated(LocalDateTime.now().minusDays(1));
         dao.save(item1);
         dao.save(item2);
-        assertThat(daoStatus.getItemCountForDate(LocalDate.now()), is(1));
-        assertThat(daoStatus.getLastItemIdForDate(LocalDate.now()), is(item1.getId()));
+        assertThat(dao.countByCreatedGreaterThanEqualAndCreatedLessThan(LocalDate.now()), is(1));
+        assertThat(dao.findFirstByCreatedGreaterThanEqualAndCreatedLessThanOrderByIdDesc(LocalDate.now()).getId(), is(item1.getId()));
     }
 
     @Test
     public void whenGetItemCountAndIdForBrandThen1AndId() {
         Brand brand = new Brand();
-        brand = (Brand) dao.save(brand);
+        brand = daoBrand.save(brand);
         Item item1 = new Item();
         item1.setBrand(brand);
         Item item2 = new Item();
         dao.save(item1);
         dao.save(item2);
-        assertThat(daoStatus.getItemCountForBrand(brand.getId()), is(1));
-        assertThat(daoStatus.getLastItemIdForBrand(brand.getId()), is(item1.getId()));
+        assertThat(dao.countByBrandId(brand.getId()), is(1));
+        assertThat(dao.findFirstByBrandIdOrderByIdDesc(brand.getId()).getId(), is(item1.getId()));
     }
 
     @Test
@@ -65,23 +74,23 @@ public class IDaoStatusTest {
         Item item2 = new Item();
         dao.save(item1);
         dao.save(item2);
-        assertThat(daoStatus.getItemCountWithImg(), is(1));
-        assertThat(daoStatus.getLastItemIdWithImg(), is(item1.getId()));
+        assertThat(dao.countByPictureNotNull(), is(1));
+        assertThat(dao.findFirstByPictureNotNullOrderByIdDesc().getId(), is(item1.getId()));
     }
 
     @Test
     public void whenAddSoldItemThenCheckIsSoldIsTrue() {
         Item item = new Item();
         item.setSold(true);
-        item = (Item) dao.save(item);
-        assertTrue(daoStatus.isSold(item.getId()));
+        item = dao.save(item);
+        assertTrue(dao.findById(item.getId()).orElseThrow().isSold());
     }
 
     @Test
     public void whenAddNotSoldItemThenCheckIsSoldIsFalse() {
         Item item = new Item();
         item.setSold(false);
-        item = (Item) dao.save(item);
-        assertFalse(daoStatus.isSold(item.getId()));
+        item = dao.save(item);
+        assertFalse(dao.findById(item.getId()).orElseThrow().isSold());
     }
 }
