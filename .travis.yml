@@ -12,6 +12,9 @@ before_install:
   - psql -c 'create database car_catalog;' -U postgres
   - psql -c 'create database hiber;' -U postgres
 
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
 env:
   global:
     CODECOV_TOKEN="e19274eb-82aa-4dfe-97cc-124d5c6fd922"
