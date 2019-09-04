@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title>Help page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container">
+    <h1>Welcome!</h1>
+    <p>This is Rest service for shortening urls (each registered url for its own user)</p>
+    <p>Also you can take redirect statistic for each user.</p>
+    <p><div>To test this service - first, create account.</div>
+    <div> Second, register some full urls, open links in new tab.</div>
+    <div>And, finally, check statistic for your specified account</div>
+    </p>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Account id</span>
+        </div>
+        <input id="accountId" type="text" class="form-control">
+        <div class="input-group-append">
+            <button id="create" class="btn btn-success" type="submit">Create account</button>
+        </div>
+    </div>
+    <div>
+        <p id="create_response"></p>
+    </div>
+    <div id="register-group" class="input-group mb-3" style="display: none">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Register URL</span>
+        </div>
+        <input id="registerUrl" type="text" class="form-control" placeholder="full url">
+        <select class="form-control" id="redirectType">
+            <option>301</option>
+            <option>302</option>
+        </select>
+        <div class="input-group-append">
+            <button id="register" class="btn btn-success" type="submit">Register Url</button>
+        </div>
+    </div>
+    <div>
+        <p id="register_response"></p>
+    </div>
+    <div id="statistic-group" class="input-group mb-3" style="display: none;">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Account Id</span>
+        </div>
+        <input id="statistic_input" type="text" class="form-control" placeholder="Account Id">
+        <button id="statistic" class="btn btn-success" type="submit">Check Statictic</button>
+    </div>
+    <div id="statistic_response">
+    </div>
+</div>
+</body>
+<script>
+    var username;
+    var password;
+
+    $(
+        $("#create").click(function () {
+            var accountId = $("#accountId").val();
+            $.ajax("/account", {
+                type: "post",
+                data: JSON.stringify({
+                    accountId: accountId
+                }),
+                contentType: "application/json"
+            }).done(function (data) {
+                $("#create_response").html(JSON.stringify(data));
+                username = accountId;
+                password = data.password;
+                $("#statistic_input").val(accountId);
+                $("#register-group").show();
+            })
+        })
+    );
+
+    $(
+        $("#register").click(function () {
+            var registerUrl = $("#registerUrl").val();
+            var redirectType = $("#redirectType").children(":selected").text();
+            $.ajax("/register", {
+                type: "post",
+                data: JSON.stringify({
+                    url: registerUrl,
+                    redirectType: redirectType
+                }),
+                headers: {
+                    "Authorization": "Basic " + btoa(username + ":" + password)
+                },
+                contentType: "application/json"
+            }).done(function (data) {
+                $("#register_response").append(
+                    "<div>" + JSON.stringify(data)
+                    + "<a href=\"" + data.shortUrl + "\"> click to redirect</a></div>");
+                $("#statistic-group").show();
+            })
+        })
+    );
+
+    $(
+        $("#statistic").click(function () {
+            var accountId = $("#statistic_input").val();
+            var fullAddress = "/statistic/" + accountId;
+            $.ajax(fullAddress, {
+                type: "get",
+                contentType: "application/json"
+            }).done(function (data) {
+                $("#statistic_response").html(JSON.stringify(data));
+            })
+        })
+    );
+</script>
+</html>
