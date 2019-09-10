@@ -51,7 +51,7 @@ public class RedirectionController {
             return new ResponseEntity<>(httpHeaders, httpStatus);
         } catch (Exception e) {
             LOG.error("Redirection failed for shot url: " + shortUrl + " accountId: "
-                    + principal.getName() + ". " + e.getMessage());
+                    + principal.getName() + ". " + e.getMessage(), e);
             throw e;
         }
     }

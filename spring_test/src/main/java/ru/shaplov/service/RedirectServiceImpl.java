@@ -55,8 +55,7 @@ public class RedirectServiceImpl implements RedirectService {
     @Override
     public RedirectUrl getRedirectAndIncrement(String shortUrl, String accountId) {
         RedirectUrl result = redirectUrlRepository.findByShortURLAndAccountAccountId(shortUrl, accountId);
-        result.setCount(result.getCount() + 1);
-        result = redirectUrlRepository.save(result);
+        redirectUrlRepository.incrementCountInUrl(shortUrl, accountId);
         return result;
     }
 

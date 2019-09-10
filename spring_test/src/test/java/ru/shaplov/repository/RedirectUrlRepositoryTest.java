@@ -91,4 +91,12 @@ public class RedirectUrlRepositoryTest {
                 is(urlRepository.findByShortURLAndAccountAccountId(testRedirect.getShortURL(),
                         testAccount.getAccountId()).getUrl()));
     }
+
+    @Test
+    public void whenIncrementCountInUrl() {
+        assertThat(testRedirect.getCount(), is(0L));
+        urlRepository.incrementCountInUrl(testRedirect.getShortURL(), testAccount.getAccountId());
+        RedirectUrl url = urlRepository.findByShortURLAndAccountAccountId(testRedirect.getShortURL(), testAccount.getAccountId());
+        assertThat(url.getCount(), is(1L));
+    }
 }

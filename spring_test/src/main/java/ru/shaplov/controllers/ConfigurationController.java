@@ -73,7 +73,7 @@ public class ConfigurationController {
                 return new OpenAccountObj(true, description, account.getDecodedPass());
             } catch (Exception e) {
                 description = "Account opening failed";
-                LOG.error(description + ". accountId: " + account.getAccountId() + System.lineSeparator() + e.getMessage());
+                LOG.error(description + ". accountId: " + account.getAccountId() + System.lineSeparator() + e.getMessage(), e);
             }
         }
         return new OpenAccountObj(false, description, null);
@@ -106,7 +106,7 @@ public class ConfigurationController {
                 LOG.info("Url registered. Full: " + redirectUrlObj.getUrl() + " Short: " + redirectUrlObj.getShortURL());
                 return node;
             } catch (Exception e) {
-                LOG.error("Failed to registry URL: " + redirectUrlObj.getUrl() + System.lineSeparator() + e.getMessage());
+                LOG.error("Failed to registry URL: " + redirectUrlObj.getUrl() + System.lineSeparator() + e.getMessage(), e);
                 throw e;
             }
         }
@@ -118,7 +118,7 @@ public class ConfigurationController {
             List<RedirectUrl> redirectUrls = redirectService.findUrlsForAccountId(accountId);
             return redirectUrls.stream().collect(Collectors.toMap(RedirectUrl::getUrl, RedirectUrl::getCount));
         } catch (Exception e) {
-            LOG.error("Could not retrieve statistics for " + accountId + ". " + e.getMessage());
+            LOG.error("Could not retrieve statistics for " + accountId + ". " + e.getMessage(), e);
             throw e;
         }
     }
