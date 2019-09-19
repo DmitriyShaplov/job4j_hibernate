@@ -1,6 +1,11 @@
 package ru.shaplov.models;
 
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
@@ -11,6 +16,8 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "items")
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Item implements ITitledEntity {
 
     @Id
@@ -23,6 +30,7 @@ public class Item implements ITitledEntity {
 
     private boolean sold;
 
+    @XmlJavaTypeAdapter(value = LocalDateTimeAdapter.class)
     private LocalDateTime created;
 
     @ManyToOne

@@ -3,6 +3,7 @@ package ru.shaplov.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -42,6 +43,7 @@ public class Brand implements ITitledEntity {
         model.setBrand(null);
     }
 
+    @XmlTransient
     public List<Model> getModels() {
         return models;
     }

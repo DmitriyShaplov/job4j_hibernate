@@ -42,7 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                    .antMatchers("/images/**", "/index.html", "/switch.css").permitAll()
+                    .antMatchers("/images/**", "/index.html", "/switch.css", "/ws/*").permitAll()
                     .antMatchers(HttpMethod.GET, "/items").permitAll()
                     .antMatchers("/registry", "/login").permitAll()
                     .antMatchers("/additem.html").access("not hasRole('ADMIN') and authenticated")

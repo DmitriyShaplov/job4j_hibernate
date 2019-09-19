@@ -36,7 +36,7 @@ public class LogicItem implements ILogicItem {
     @Override
     public Item save(Item entity, Part file) {
         try {
-            if (file.getSize() > 0) {
+            if (file != null && file.getSize() > 0) {
                 PictureLob img = new PictureLob();
                 img.setImg(file.getInputStream().readAllBytes());
                 img.setMimeType(file.getContentType());
