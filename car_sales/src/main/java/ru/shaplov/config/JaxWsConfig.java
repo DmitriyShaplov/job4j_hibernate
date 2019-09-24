@@ -10,8 +10,8 @@ import org.springframework.context.annotation.ImportResource;
  * @author shaplov
  * @since 19.09.2019
  */
-@Configuration
-@ImportResource("classpath:/spring-ws.xml")
+//@Configuration
+//@ImportResource("classpath:/spring-ws.xml")
 public class JaxWsConfig {
 
     @Bean

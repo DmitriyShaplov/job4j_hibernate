@@ -15,6 +15,7 @@
         <module>spring_ioc</module>
         <module>spring_test</module>
         <module>ws</module>
+        <module>spring_ws_client</module>
     </modules>
     <name>hibernate</name>
 

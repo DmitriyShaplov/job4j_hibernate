@@ -13,8 +13,8 @@ import javax.jws.soap.SOAPBinding;
  * @author shaplov
  * @since 19.09.2019
  */
-@WebService
-@SOAPBinding(style = SOAPBinding.Style.RPC)
+//@WebService
+//@SOAPBinding(style = SOAPBinding.Style.RPC)
 public class UserWebService extends SpringBeanAutowiringSupport {
 
     @Autowired

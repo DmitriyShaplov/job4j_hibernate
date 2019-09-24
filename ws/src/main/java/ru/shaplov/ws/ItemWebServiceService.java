@@ -19,8 +19,7 @@ import javax.xml.ws.WebServiceFeature;
  */
 @WebServiceClient(name = "ItemWebServiceService", targetNamespace = "http://ws.shaplov.ru/", wsdlLocation = "http://localhost:8080/car_sales/ws/itemService?wsdl")
 public class ItemWebServiceService
-    extends Service
-{
+    extends Service {
 
     private final static URL ITEMWEBSERVICESERVICE_WSDL_LOCATION;
     private final static WebServiceException ITEMWEBSERVICESERVICE_EXCEPTION;
@@ -39,11 +38,11 @@ public class ItemWebServiceService
     }
 
     public ItemWebServiceService() {
-        super(__getWsdlLocation(), ITEMWEBSERVICESERVICE_QNAME);
+        super(getWsdlLocation(), ITEMWEBSERVICESERVICE_QNAME);
     }
 
     public ItemWebServiceService(WebServiceFeature... features) {
-        super(__getWsdlLocation(), ITEMWEBSERVICESERVICE_QNAME, features);
+        super(getWsdlLocation(), ITEMWEBSERVICESERVICE_QNAME, features);
     }
 
     public ItemWebServiceService(URL wsdlLocation) {
@@ -84,8 +83,8 @@ public class ItemWebServiceService
         return super.getPort(new QName("http://ws.shaplov.ru/", "ItemWebServicePort"), ItemWebService.class, features);
     }
 
-    private static URL __getWsdlLocation() {
-        if (ITEMWEBSERVICESERVICE_EXCEPTION!= null) {
+    private static URL getWsdlLocation() {
+        if (ITEMWEBSERVICESERVICE_EXCEPTION != null) {
             throw ITEMWEBSERVICESERVICE_EXCEPTION;
         }
         return ITEMWEBSERVICESERVICE_WSDL_LOCATION;
