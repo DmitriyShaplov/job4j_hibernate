@@ -31,8 +31,8 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _GetItemsRequest_QNAME = new QName("http://ws.shaplov.ru/", "getItemsRequest");
-    private final static QName _Item_QNAME = new QName("http://ws.shaplov.ru/", "item");
+    private final static QName GET_ITEMS_REQUEST_QNAME = new QName("http://ws.shaplov.ru/", "getItemsRequest");
+    private final static QName ITEM_QNAME = new QName("http://ws.shaplov.ru/", "item");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: client.wsdl
@@ -155,7 +155,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://ws.shaplov.ru/", name = "getItemsRequest")
     public JAXBElement<Object> createGetItemsRequest(Object value) {
-        return new JAXBElement<Object>(_GetItemsRequest_QNAME, Object.class, null, value);
+        return new JAXBElement<Object>(GET_ITEMS_REQUEST_QNAME, Object.class, null, value);
     }
 
     /**
@@ -168,7 +168,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://ws.shaplov.ru/", name = "item")
     public JAXBElement<Item> createItem(Item value) {
-        return new JAXBElement<Item>(_Item_QNAME, Item.class, null, value);
+        return new JAXBElement<Item>(ITEM_QNAME, Item.class, null, value);
     }
 
 }
