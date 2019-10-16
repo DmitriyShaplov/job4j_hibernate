@@ -2,6 +2,7 @@ package ru.shaplov.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.activemq.broker.BrokerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockPart;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.shaplov.jms.Publisher;
 import ru.shaplov.logic.ILogicItem;
 import ru.shaplov.models.*;
 import ru.shaplov.principal.CarUserPrincipal;
@@ -34,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestPropertySource("/application-test.properties")
 public class ItemsControllerTest {
 
     @Autowired
@@ -41,6 +45,12 @@ public class ItemsControllerTest {
 
     @MockBean
     private ILogicItem service;
+
+    @MockBean
+    private Publisher publisher;
+
+    @MockBean
+    private BrokerService broker;
 
     @Test
     public void whenGetItemsListThenJsonList() throws Exception {

@@ -16,6 +16,7 @@
         <module>spring_test</module>
         <module>ws</module>
         <module>spring_ws_client</module>
+        <module>car_subscriber</module>
     </modules>
     <name>hibernate</name>
 
@@ -213,6 +214,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <version>2.1.7.RELEASE</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-activemq -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-activemq</artifactId>
+            <version>2.1.9.RELEASE</version>
         </dependency>
 
         <dependency>

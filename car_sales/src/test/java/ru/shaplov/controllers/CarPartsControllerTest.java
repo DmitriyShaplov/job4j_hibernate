@@ -1,6 +1,7 @@
 package ru.shaplov.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.activemq.broker.BrokerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +9,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.shaplov.jms.Publisher;
 import ru.shaplov.logic.ILogicParts;
 import ru.shaplov.models.BodyType;
 import ru.shaplov.models.Brand;
@@ -29,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @WithMockUser
+@TestPropertySource("/application-test.properties")
 public class CarPartsControllerTest {
 
     @Autowired
@@ -36,6 +40,12 @@ public class CarPartsControllerTest {
 
     @MockBean
     private ILogicParts logicParts;
+
+    @MockBean
+    private Publisher publisher;
+
+    @MockBean
+    private BrokerService broker;
 
     @Test
     public void whenGetBrandThenList() throws Exception {

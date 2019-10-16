@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ru.shaplov.exceptions.BadRequestException;
 import ru.shaplov.exceptions.UnauthorizedException;
+import ru.shaplov.jms.Publisher;
 import ru.shaplov.logic.ILogicItem;
 import ru.shaplov.models.*;
 import ru.shaplov.principal.CarUserPrincipal;
@@ -38,13 +39,15 @@ public class ItemsController {
     private static final Logger LOG = LogManager.getLogger(ItemsController.class);
 
     private final ILogicItem logic;
+    private final Publisher publisher;
 
     private final Map<String, BiConsumer<String, Item>> paramMap = new HashMap<>();
     private final Map<String, Function<Map<String, String>, List<Item>>> listMap = new HashMap<>();
 
     @Autowired
-    public ItemsController(ILogicItem logic) {
+    public ItemsController(ILogicItem logic, Publisher publisher) {
         this.logic = logic;
+        this.publisher = publisher;
         paramMap.put("name", (v, item) -> item.setTitle(v));
         paramMap.put("brand", (v, item) -> item.setBrand(new Brand(Integer.parseInt(v))));
         paramMap.put("model", (v, item) -> item.setModel(new Model(Integer.parseInt(v))));
@@ -93,6 +96,9 @@ public class ItemsController {
             }
             Item item = new Item(itemId);
             logic.delete(item);
+            publisher.send(
+                    String.format("Item with id=%s deleted.", item.getId())
+            );
             LOG.info("Item id " + item.getId() + " deleted");
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode node = mapper.createObjectNode();
@@ -123,6 +129,10 @@ public class ItemsController {
                 paramMap.get(entry.getKey()).accept(entry.getValue(), item);
             }
             logic.save(item, file);
+            publisher.send(
+                    String.format("New item created. Id=%s, title=%s",
+                            item.getId(), item.getTitle())
+            );
             return "redirect:/index.html";
         } catch (Exception e) {
             LOG.error("Error parsing multipart/form-data");
@@ -180,6 +190,9 @@ public class ItemsController {
                 node.put("success", true);
                 node.put("sold", storedItem.isSold());
                 LOG.info("Item status sold changed on " + sold);
+                publisher.send(
+                        String.format("Item with id=%s sold=%s", item.getId(), sold)
+                );
             }
             return mapper.writeValueAsString(node);
         } catch (Exception e) {
