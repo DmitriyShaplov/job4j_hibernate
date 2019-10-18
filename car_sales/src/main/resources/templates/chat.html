@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Item chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="../css/app.css"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="../js/app.js"></script>
+    <style>
+        #chat {
+            min-width: 300px;
+            overflow-y: scroll;
+            height: 500px;
+            margin: 0 5px 50px 0;
+        }
+    </style>
+</head>
+<div id="item-id" style="display: none" th:text="${item.id}"></div>
+<body>
+    <div class="container">
+        <div class="header-1">
+            <h4>Chat for Item ID=<span th:text="${item.id}"/> title=<span th:text="${item.title}"/> </h4>
+        </div>
+
+        <div class="item" style="width: 100%; min-width: 800px; flex-direction: row">
+            <div class="item" style="min-width: 350px; width: 350px;">
+                <div class="sold"></div>
+                <div class="header">
+                    <div style='display: flex'>
+                        <h6 style='width: 80%' class='item_title' th:text="${item.title}"></h6>
+                        <a style='text-align: right; width: 20%;' href="../index.html">back</a>
+                    </div>
+                    <div class='tel' style="text-align: right" th:text="${item.user.tel}"></div>
+                </div>
+                <div class="column left">
+                    <img alt="car" th:src="${item.picture != null} ? '../images/' + ${item.picture} : '../images/system/No_image/png'"/>
+                </div>
+                <div class="column">
+                    <ul class="list-group">
+                        <li class="list-group-item box">
+                            <div class="column text-1"><b>Марка:</b></div>
+                            <div class="column text-1 brand" th:text="${item.brand.title}"></div>
+                        </li>
+                        <li class="list-group-item box">
+                            <div class="column text-1"><b>Модель:</b></div>
+                            <div class="column text-1 model" th:text="${item.model.title}"></div>
+                        </li>
+                        <li class="list-group-item box">
+                            <div class="column text-1"><b>Тип кузова:</b></div>
+                            <div class="column text-1 body" th:text="${item.body.title}"></div>
+                        </li>
+                        <li class="list-group-item box">
+                            <div class="column text-1"><b>Тип двигателя:</b></div>
+                            <div class="column text-1 engine" th:text="${item.engine.title}"></div>
+                        </li>
+                        <li class="list-group-item box">
+                            <div class="column text-1"><b>Привод:</b></div>
+                            <div class="column text-1 drive" th:text="${item.drive.title}"></div>
+                        </li>
+                        <li class="list-group-item box">
+                            <div class="column text-1"><b>Коробка передач:</b></div>
+                            <div class="column text-1 trans" th:text="${item.trans.title}"></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="item" style="width: 100%">
+                <div id="chat" class="row align-content-start">
+                </div>
+                <form style="position: absolute; bottom: 0; padding: 0 20px 10px 0" class="input-group">
+                    <input type="text" id="text" class="form-control" placeholder="Text...">
+                    <div class="input-group-append">
+                        <button id="send" class="btn btn-success" type="submit">Send</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div id="users"></div>
+    </div>
+
+</body>
+</html>
