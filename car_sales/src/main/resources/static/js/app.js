@@ -4,7 +4,12 @@ function connect() {
     let socket = new SockJS('../websocket');
     stompClient = Stomp.over(socket);
     let id = $("#item-id").text();
-    stompClient.connect({}, function(frame) {
+    let headers = {};
+    let tokEl = $("[name='_csrf']");
+    let headerName = tokEl.prop("name");
+    let token = tokEl.val();
+    headers[headerName] = token;
+    stompClient.connect(headers, function(frame) {
         stompClient.subscribe('/chat/' + id + '/save', function (msg) {
             addMessage(JSON.parse(msg.body));
         });

@@ -64,7 +64,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     })
                     .invalidateHttpSession(true)
                 .and()
-                    .csrf().disable();
+                .csrf()
+                    .ignoringAntMatchers("**");
+//                    .and()
+//                    .headers()
+//                    .frameOptions().sameOrigin();
     }
 
     @Override
