@@ -5,7 +5,7 @@ function connect() {
     stompClient = Stomp.over(socket);
     let id = $("#item-id").text();
     let headers = {};
-    let tokEl = $("[name='_csrf']");
+    let tokEl = $("#_hidden");
     let headerName = tokEl.prop("name");
     let token = tokEl.val();
     headers[headerName] = token;

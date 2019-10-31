@@ -25,8 +25,9 @@
 <div id="item-id" style="display: none" th:text="${item.id}"></div>
 <body>
 <input
+        id="_hidden"
         type="hidden"
-        th:name="${_csrf.parameterName}"
+        th:name="${_csrf.headerName}"
         th:value="${_csrf.token}" />
     <div class="container">
         <div class="header-1">
